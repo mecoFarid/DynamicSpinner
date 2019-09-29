@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SearchableView">
+        <attr name="ss_icon_closeSearchview"/>
+        <attr name="ss_icon_openSearchview"/>
+    </declare-styleable>
+
+    <declare-styleable name="SpinnerView">
+        <attr name="ss_elevation"/>
+        <attr name="ss_cornerRadius"/>
+        <attr name="ss_backgroundColor"/>
+    </declare-styleable>
+</resources>

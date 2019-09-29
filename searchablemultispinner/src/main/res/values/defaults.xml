@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <drawable name="close_searchview_icon">@drawable/ic_close_search</drawable>
+    <drawable name="open_searchview_icon">@drawable/ic_open_search</drawable>
+
+    <color name="color_close_searchview_icon">#848484</color>
+    <color name="color_open_searchview_icon">#848484</color>
+</resources>

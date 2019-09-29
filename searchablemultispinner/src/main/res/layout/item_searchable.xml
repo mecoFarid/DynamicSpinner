@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="">
+
+    <ImageView
+        android:id="@+id/search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:paddingStart="@dimen/dimension_8dp"
+        android:paddingTop="@dimen/dimension_8dp"
+        android:paddingBottom="@dimen/dimension_8dp"
+        android:src="@drawable/ic_open_search"/>
+
+    <AutoCompleteTextView
+        android:id="@+id/autocomplete_textview"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:singleLine="true"
+        style="?attr/spinnerDropDownItemStyle"
+        android:inputType="textNoSuggestions"
+        android:background="@android:color/transparent"
+        android:layout_gravity="center"
+        android:paddingTop="@dimen/dimension_16dp"
+        android:paddingBottom="@dimen/dimension_16dp"
+        android:layout_toEndOf="@id/search"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:cursorVisible="false"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@id/close" />
+
+    <ImageView
+        android:id="@+id/close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone"
+        android:paddingEnd="@dimen/dimension_8dp"
+        android:paddingTop="@dimen/dimension_8dp"
+        android:paddingBottom="@dimen/dimension_8dp"
+        android:src="@drawable/ic_close_search"/>
+
+</RelativeLayout>
