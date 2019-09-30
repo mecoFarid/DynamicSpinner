@@ -162,7 +162,7 @@ class SearchableView : RelativeLayout {
         this.mItemSelectedListener = mItemSelectedListener
     }
 
-    fun setSelectedItem(selectedItem: Any) {
+    fun setSelectedItem(selectedItem: ItemSpinner) {
         mSelectedItem = selectedItem
         mItemSelectedListener.onItemSelected(mSelectedItem)
         // This is necessary to make AutoCompleteTextView uneditable when item selected from AutoCompleteTextView's options list
