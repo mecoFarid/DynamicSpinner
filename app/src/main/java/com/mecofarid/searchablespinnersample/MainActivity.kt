@@ -15,21 +15,12 @@ class MainActivity : AppCompatActivity(){
 
         val list = Gson().fromJson<MainModel>(json, MainModel::class.java).plant
 
-        println("meco new list "+list)
         list?.let {
-            val newList = Utils.hierarchicToRelationalList(list, -1, 0)
-            println("meco new list "+newList)
+            val newList = Utils.nestedToFlatList(list, -1, 0)
+            newList.forEach {
+                println("meco new list "+it.id +" parentId "+it.parentId+" level "+it.level)
+            }
         }
-
-
-
-
-
-//        val a = ArrayList<Red>()
-//        for (i in 1..5){
-//            a.add(Red())
-//        }
-//        println("meco new red "+a.get(0).parentId)
     }
 
 }

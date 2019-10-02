@@ -6,29 +6,29 @@ import java.lang.reflect.Field
 
 
 /**
-    This method will convert hierarchic list to relational list. Meaning, in hierarchic form, list objects looks like
+    This method will convert nested list to relational list. Meaning, in nested form, list objects looks like
     nested JSON object, however in case of relational from, list object will look like JSON with single root and all items
     will have id and parentId to indicate how they relate to other items of higher level.
 
      Hierarchic example:
 
-    __ plant 1
-          |____unit 1
-                  |____equipment 1
-                  |____equipment 2
-                  |____equipment 3
-
-          |____unit 2
-                  |____equipment 4
-                  |____equipment 5
-                  |____equipment 6
-
-          |____unit 3
-                  |____equipment 7
-                  |____equipment 8
-                  |____equipment 9
-
-    __ plant 2
+   ___ plant 1
+    |     |____unit 1
+    |             |____equipment 1
+    |             |____equipment 2
+    |             |____equipment 3
+    |
+    |     |____unit 2
+    |             |____equipment 4
+    |             |____equipment 5
+    |             |____equipment 6
+    |
+    |     |____unit 3
+    |             |____equipment 7
+    |             |____equipment 8
+    |             |____equipment 9
+    |
+    |_ plant 2
           |_____unit 4
                   |____
 
@@ -52,14 +52,22 @@ class Utils {
 
         var itemId: Long = -1
 
-        // First time passed parameters should be as follows: id = -1, parentId = -1, level = 0
+         
 
-        fun hierarchicToRelationalList(
+        /**
+         * First time passed parameters should be as follows: id = -1, parentId = -1, level = 0
+         * Converts nested [inputList] to flat list of items
+         * 
+         * @param inputList - The nested list
+         * @param parentId - Id of parent item in flat list. Since returned list is flat, we have to keep reference 
+         * to parents in nested list
+         * @param level - Category level of current item
+         */
+        fun nestedToFlatList(
             inputList: List<ItemSpinner>,
             parentId: Int,
             level: Int
         ): List<ItemSpinner> {
-
             val outputList = ArrayList<ItemSpinner>()
             inputList.forEach { item ->
                 itemId++
@@ -74,7 +82,7 @@ class Utils {
 
                     // Add subcategories to list to be returned to calling function
                     outputList.addAll(
-                        hierarchicToRelationalList(
+                        nestedToFlatList(
                             itemList,
                             itemId.toInt(),
                             level + 1
@@ -85,13 +93,9 @@ class Utils {
             return outputList;
         }
 
-
         // Return subcategory
         private inline fun <reified T> getSubcategory(obj: ItemSpinner): T? {
-            obj.javaClass.declaredFields.forEach {
-                // set private fields accessible
-                it.isAccessible = true
-
+            getFields(obj.javaClass).forEach {
                 if (isAnnotatedWith(it, SubCategory::class.java)) {
                     return it.get(obj) as T
                 }
@@ -100,24 +104,9 @@ class Utils {
         }
 
         /**
-         * @param sourceObject Object will be copied to another object except field annotated with [SubCategory]
+         * @param sourceObject Object to be copied to another object except field annotated with [SubCategory]
          */
         private fun cloneObjectWithoutSubcategory(sourceObject: ItemSpinner): ItemSpinner {
-//            val unreferencedCopy = Class.forName(obj.javaClass.name).getConstructor().newInstance()
-//            obj.javaClass.declaredFields.forEach {
-//                // set private fields accessible
-//                it.isAccessible = true
-//
-//                /**
-//                 * To prevent repetitiveness, the field annotated with [SubCategory] will be set to null
-//                 */
-//                if (isAnnotatedWith(it)) {
-//                    it.set(obj, null)
-//                }
-//            }
-//
-//            return obj
-
             val targetObject = Class.forName(sourceObject.javaClass.name).getConstructor().newInstance()
             val pairedFieldSet = getPairedFields(sourceObject.javaClass, targetObject.javaClass)
 
@@ -143,11 +132,11 @@ class Utils {
          * @param target - Target class
          * @param source - Source class
          *
-         * Will never return null because [mapSourceFieldsToCorrespondingTargetFields] never returns null
+         * Will never return null because [getMappedFieldSet] never returns null
          */
         private fun getPairedFields(source: Class<*>, target: Class<*>): Map<Field, Field> {
             if (sPairedFieldSet[target] == null) {
-                val pairedFieldSet = mapSourceFieldsToCorrespondingTargetFields(source, target)
+                val pairedFieldSet = getMappedFieldSet(source, target)
                 sPairedFieldSet[target] = pairedFieldSet
             }
             return sPairedFieldSet[target]!!
@@ -159,7 +148,7 @@ class Utils {
          * @param target - Target class
          * @param source - Source class
          */
-        private fun mapSourceFieldsToCorrespondingTargetFields(
+        private fun getMappedFieldSet(
             source: Class<*>,
             target: Class<*>
         ): Map<Field, Field> {
@@ -186,8 +175,12 @@ class Utils {
         private fun getFields(clazz: Class<*>): Array<Field> {
             // Check if that classes fields are in cache use them other wise add them
             if (sFieldSet[clazz] == null) {
-                val declaredFields = clazz.declaredFields
-                sFieldSet[clazz] = declaredFields
+                val classFields = clazz.declaredFields
+                val rootParentFields = clazz.superclass?.declaredFields
+                    ?: throw ClassNotFoundException("$clazz must extends ${clazz.superclass}. For more info, " +
+                            "check library's README.md here https://github.com/mecoFarid/SearchableMultiSpinner")
+                val allFields = arrayOf(*classFields, *rootParentFields)
+                sFieldSet[clazz] = allFields
             }
             return sFieldSet[clazz]!!
         }
