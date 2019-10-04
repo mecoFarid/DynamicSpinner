@@ -2,10 +2,22 @@ package com.mecofarid.searchablespinnersample
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import com.google.gson.Gson
-import com.mecofarid.searchablemultispinner.util.Utils
+import com.mecofarid.searchablemultispinner.adapter.SearchableMultiSpinnerAdapter
+import kotlinx.android.synthetic.main.activity_main.*
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.view.MotionEvent
+import com.mecofarid.searchablemultispinner.interfaces.SpinnerItemSelectedListener
+import com.mecofarid.searchablemultispinner.model.ItemSpinner
 
-class MainActivity : AppCompatActivity(){
+
+class MainActivity : AppCompatActivity(), SpinnerItemSelectedListener{
+    override fun onItemSelected(itemSpinner: ItemSpinner) {
+        println("meco here too "+itemSpinner.level)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -16,10 +28,8 @@ class MainActivity : AppCompatActivity(){
         val list = Gson().fromJson<MainModel>(json, MainModel::class.java).plant
 
         list?.let {
-            val newList = Utils.nestedToFlatList(list, -1, 0)
-            newList.forEach {
-                println("meco new list "+it.id +" parentId "+it.parentId+" level "+it.level)
-            }
+            val adapter = SearchableMultiSpinnerAdapter(list, this)
+            recyclerview.adapter = adapter
         }
     }
 

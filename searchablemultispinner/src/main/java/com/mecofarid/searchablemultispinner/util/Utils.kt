@@ -1,13 +1,16 @@
 package com.mecofarid.searchablemultispinner.util
 
+import android.content.Context
+import android.widget.ArrayAdapter
+import androidx.annotation.IntegerRes
 import com.mecofarid.searchablemultispinner.annotation.SubCategory
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
 import java.lang.reflect.Field
 
 
 /**
-    This method will convert nested list to relational list. Meaning, in nested form, list objects looks like
-    nested JSON object, however in case of relational from, list object will look like JSON with single root and all items
+    This method will convert nested list to flat list. Meaning, in nested form, list objects looks like
+    nested JSON object, however in case of flat from, list object will look like JSON with single root and all items
     will have id and parentId to indicate how they relate to other items of higher level.
 
      Hierarchic example:
@@ -52,24 +55,51 @@ class Utils {
 
         var itemId: Long = -1
 
-         
-
         /**
          * First time passed parameters should be as follows: id = -1, parentId = -1, level = 0
-         * Converts nested [inputList] to flat list of items
-         * 
+         * Converts nested [inputList] to hierarchic flat list of items
+         *
          * @param inputList - The nested list
-         * @param parentId - Id of parent item in flat list. Since returned list is flat, we have to keep reference 
+         * @param parentId - Id of parent item in flat list. Since returned list is flat, we have to keep reference
          * to parents in nested list
          * @param level - Category level of current item
          */
-        fun nestedToFlatList(
-            inputList: List<ItemSpinner>,
+        fun toHierarchicFlatList(
+            nestedList: List<ItemSpinner>,
+            parentId: Int,
+            level: Int
+        ): List<List<ItemSpinner>> {
+            val hierarchicList = ArrayList<ArrayList<ItemSpinner>>()
+
+            getFlatList(nestedList, parentId, level).forEach { itemSpinner ->
+                hierarchicList.apply {
+                    elementAtOrNull(itemSpinner.level)?.let { innerList ->
+                        innerList.add(itemSpinner)
+                        // continue to next item otherwise `add(arrayListOf(itemSpinner))` will be executed and add
+                        // unnecessary hierarchy
+                        return@forEach
+                    }
+                    add(arrayListOf(itemSpinner))
+                }
+            }
+            return hierarchicList
+        }
+
+        /**
+         * Converts nested [nestedList] to flat list of items
+         *
+         * @param nestedList - The nested list
+         * @param parentId - Id of parent item in flat list. Since returned list is flat, we have to keep reference
+         * to parents in nested list
+         * @param level - Category level of current item
+         */
+        fun getFlatList(
+            nestedList: List<ItemSpinner>,
             parentId: Int,
             level: Int
         ): List<ItemSpinner> {
             val outputList = ArrayList<ItemSpinner>()
-            inputList.forEach { item ->
+            nestedList.forEach { item ->
                 itemId++
                 item.id = itemId
                 item.parentId = parentId
@@ -82,7 +112,7 @@ class Utils {
 
                     // Add subcategories to list to be returned to calling function
                     outputList.addAll(
-                        nestedToFlatList(
+                        getFlatList(
                             itemList,
                             itemId.toInt(),
                             level + 1
@@ -107,7 +137,8 @@ class Utils {
          * @param sourceObject Object to be copied to another object except field annotated with [SubCategory]
          */
         private fun cloneObjectWithoutSubcategory(sourceObject: ItemSpinner): ItemSpinner {
-            val targetObject = Class.forName(sourceObject.javaClass.name).getConstructor().newInstance()
+            val targetObject =
+                Class.forName(sourceObject.javaClass.name).getConstructor().newInstance()
             val pairedFieldSet = getPairedFields(sourceObject.javaClass, targetObject.javaClass)
 
             pairedFieldSet.keys.forEach { targetField ->
@@ -177,8 +208,10 @@ class Utils {
             if (sFieldSet[clazz] == null) {
                 val classFields = clazz.declaredFields
                 val rootParentFields = clazz.superclass?.declaredFields
-                    ?: throw ClassNotFoundException("$clazz must extends ${clazz.superclass}. For more info, " +
-                            "check library's README.md here https://github.com/mecoFarid/SearchableMultiSpinner")
+                    ?: throw ClassNotFoundException(
+                        "$clazz must extends ${clazz.superclass}. For more info, " +
+                                "check library's README.md here https://github.com/mecoFarid/SearchableMultiSpinner"
+                    )
                 val allFields = arrayOf(*classFields, *rootParentFields)
                 sFieldSet[clazz] = allFields
             }

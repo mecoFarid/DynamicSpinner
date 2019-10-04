@@ -5,6 +5,7 @@ import com.mecofarid.searchablemultispinner.model.ItemSpinner
 
 class MainModel: ItemSpinner(){
     var plant: List<Plant>? = null
+
 }
 
 class Plant: ItemSpinner(){
@@ -12,6 +13,14 @@ class Plant: ItemSpinner(){
     var plantLocation: String? = null
     @SubCategory
     var unit: List<Unit>? = null
+
+    override fun toString(): String {
+        plantLocation?.let {
+            return it
+        }
+
+        return ""
+    }
 }
 
 class Unit: ItemSpinner(){
