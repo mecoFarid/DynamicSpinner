@@ -7,12 +7,14 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.core.content.ContextCompat
 import com.mecofarid.searchablemultispinner.R
-import com.mecofarid.searchablemultispinner.interfaces.SpinnerItemSelectedListener
+import com.mecofarid.searchablemultispinner.adapter.SearchableMultiSpinnerAdapter.SpinnerItemSelectedListener
+//import com.mecofarid.searchablemultispinner.adapter.SearchableMultiSpinnerAdapter.SpinnerItemClickedListener
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
 
 
-class SearchableView : RelativeLayout, AdapterView.OnItemClickListener{
+internal class SearchableView : RelativeLayout{
 
+//    private var mSpinnerItemClickedListener: SpinnerItemClickedListener? = null
     private var mSpinnerItemSelectedListener: SpinnerItemSelectedListener? = null
     private lateinit var mSelectedItem: ItemSpinner
     private lateinit var mAutoCompleteTextView: AutoCompleteTextView
@@ -52,7 +54,9 @@ class SearchableView : RelativeLayout, AdapterView.OnItemClickListener{
         // As soon as SearchView is opened make AutoCompleteTextView match its parent
         mOpenSearch_view.setOnClickListener { openSearchIfClosed() }
         mCloseSearch_view.setOnClickListener { closeSearchIfOpen() }
-        mAutoCompleteTextView.onItemClickListener = this
+        mAutoCompleteTextView.setOnItemClickListener { p0, p1, p2, p3 ->
+            setSelectedItem(mAutoCompleteTextView.adapter.getItem(p2) as ItemSpinner)
+        }
 
         // If focus changes that means other view gained focus then close the current spinner
         mAutoCompleteTextView.onFocusChangeListener =
@@ -158,8 +162,7 @@ class SearchableView : RelativeLayout, AdapterView.OnItemClickListener{
     }
 
     /**
-     * @param itemClickListener The listener to be passed to AutoCompleteTextView to detect clicks on
-     * AutoCompleteTextView's selection list
+     * @param itemClickListener The listener to be passed to SearchableView to detect automatic selections
      */
     fun setOnSpinnerItemSelectedListener(spinnerItemSelectedListener: SpinnerItemSelectedListener) {
         mSpinnerItemSelectedListener = spinnerItemSelectedListener
@@ -178,12 +181,6 @@ class SearchableView : RelativeLayout, AdapterView.OnItemClickListener{
 
         // This is necessary to make AutoCompleteTextView uneditable when item selected from AutoCompleteTextView's options list
         closeSearchIfOpen()
-    }
-
-    // This is AutoCompleteTextView's built-in function to get clicked item
-    override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-        println("meceo ie")
-        setSelectedItem(mAutoCompleteTextView.adapter.getItem(p2) as ItemSpinner)
     }
 
     // Returns weather SearchableView is open or not. Namely, search by typing is possible or not

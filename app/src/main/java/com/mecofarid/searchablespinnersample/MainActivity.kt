@@ -2,19 +2,14 @@ package com.mecofarid.searchablespinnersample
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import com.google.gson.Gson
 import com.mecofarid.searchablemultispinner.adapter.SearchableMultiSpinnerAdapter
 import kotlinx.android.synthetic.main.activity_main.*
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.view.MotionEvent
-import com.mecofarid.searchablemultispinner.interfaces.SpinnerItemSelectedListener
+import com.mecofarid.searchablemultispinner.adapter.SearchableMultiSpinnerAdapter.SpinnerItemSelectedListener
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
 
 
-class MainActivity : AppCompatActivity(), SpinnerItemSelectedListener{
+class MainActivity : AppCompatActivity(), SearchableMultiSpinnerAdapter.SpinnerItemSelectedListener{
     override fun onItemSelected(itemSpinner: ItemSpinner) {
         println("meco here too "+itemSpinner.level)
     }
