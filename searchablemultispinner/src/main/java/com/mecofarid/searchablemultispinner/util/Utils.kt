@@ -66,7 +66,7 @@ class Utils {
          */
         fun toHierarchicFlatList(
             nestedList: List<ItemSpinner>,
-            parentId: Int,
+            parentId: Long,
             level: Int
         ): List<List<ItemSpinner>> {
             val hierarchicList = ArrayList<ArrayList<ItemSpinner>>()
@@ -95,7 +95,7 @@ class Utils {
          */
         fun getFlatList(
             nestedList: List<ItemSpinner>,
-            parentId: Int,
+            parentId: Long,
             level: Int
         ): List<ItemSpinner> {
             val outputList = ArrayList<ItemSpinner>()
@@ -114,7 +114,7 @@ class Utils {
                     outputList.addAll(
                         getFlatList(
                             itemList,
-                            itemId.toInt(),
+                            itemId,
                             level + 1
                         )
                     )

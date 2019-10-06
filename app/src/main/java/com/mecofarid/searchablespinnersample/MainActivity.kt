@@ -2,11 +2,15 @@ package com.mecofarid.searchablespinnersample
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.widget.ArrayAdapter
 import com.google.gson.Gson
 import com.mecofarid.searchablemultispinner.adapter.SearchableMultiSpinnerAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import com.mecofarid.searchablemultispinner.adapter.SearchableMultiSpinnerAdapter.SpinnerItemSelectedListener
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity(), SearchableMultiSpinnerAdapter.SpinnerItemSelectedListener{
@@ -26,6 +30,22 @@ class MainActivity : AppCompatActivity(), SearchableMultiSpinnerAdapter.SpinnerI
             val adapter = SearchableMultiSpinnerAdapter(list, this)
             recyclerview.adapter = adapter
         }
+
+
+        val strings = arrayListOf("ara","aru","bara","cara","dara","gara","hara")
+        val stroong = ArrayList<String>()
+        val stringadapter = CustomArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, stroong)
+        lete.setAdapter(stringadapter)
+
+        stroong.addAll(strings)
+
+
+        strings[0] = "arra"
+        Handler().postDelayed({
+            println("meco bara")
+            println("meco bara "+strings[1])
+        }, 5000)
+
     }
 
 }

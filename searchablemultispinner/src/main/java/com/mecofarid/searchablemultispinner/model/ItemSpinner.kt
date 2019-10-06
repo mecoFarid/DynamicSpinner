@@ -3,6 +3,6 @@ package com.mecofarid.searchablemultispinner.model
 open class ItemSpinner {
 
     var level: Int = 0
-    var id: Long = -1
-    var parentId = -1
+    var id: Long = -1L
+    var parentId = -1L
 }

@@ -14,13 +14,12 @@ import com.mecofarid.searchablemultispinner.model.ItemSpinner
 
 internal class SearchableView : RelativeLayout{
 
-//    private var mSpinnerItemClickedListener: SpinnerItemClickedListener? = null
+    private val mSpinnerItemList: ArrayList<ItemSpinner> = ArrayList()
     private var mSpinnerItemSelectedListener: SpinnerItemSelectedListener? = null
     private lateinit var mSelectedItem: ItemSpinner
     private lateinit var mAutoCompleteTextView: AutoCompleteTextView
     private lateinit var mOpenSearch_view: ImageView
     private lateinit var mCloseSearch_view: ImageView
-    private lateinit var mContext: Context
     private var mInpuMethodManager: InputMethodManager? = null
 
     // Whether AutoCompleteTextView is editable or not
@@ -43,19 +42,25 @@ internal class SearchableView : RelativeLayout{
 
     // Initializes basic built-in functionality of SearchableView
     private fun init(context: Context) {
-        mContext = context
-        mInpuMethodManager = ContextCompat.getSystemService(mContext, InputMethodManager::class.java)
+        mInpuMethodManager = ContextCompat.getSystemService(context, InputMethodManager::class.java)
 
         val view = View.inflate(context, R.layout.item_searchable, null)
         mAutoCompleteTextView = view.findViewById(R.id.autocomplete_textview)
         mOpenSearch_view = view.findViewById(R.id.search)
         mCloseSearch_view = view.findViewById(R.id.close)
 
+        // Items will added later
+        val arrayAdapter = ArrayAdapter(context, R.layout.support_simple_spinner_dropdown_item, mSpinnerItemList)
+        mAutoCompleteTextView.setAdapter(arrayAdapter)
+
         // As soon as SearchView is opened make AutoCompleteTextView match its parent
         mOpenSearch_view.setOnClickListener { openSearchIfClosed() }
         mCloseSearch_view.setOnClickListener { closeSearchIfOpen() }
         mAutoCompleteTextView.setOnItemClickListener { p0, p1, p2, p3 ->
             setSelectedItem(mAutoCompleteTextView.adapter.getItem(p2) as ItemSpinner)
+        }
+        mAutoCompleteTextView.setOnClickListener {
+            showDropDownIfSearchNotOpen()
         }
 
         // If focus changes that means other view gained focus then close the current spinner
@@ -154,11 +159,20 @@ internal class SearchableView : RelativeLayout{
         }
     }
 
+//    /**
+//     * @param adapter The adapter to be passed to AutoCompleteTextView
+//     */
+//    fun setAdapter(adapter: ArrayAdapter<ItemSpinner>) {
+//        mAutoCompleteTextView.setAdapter(adapter)
+//    }
+
     /**
-     * @param adapter The adapter to be passed to AutoCompleteTextView
+     * @param itemList- ItemSpinner list to be passed to AutoCompleteTextView
      */
-    fun setAutoCompleteAdapter(adapter: ArrayAdapter<in ItemSpinner>) {
-        mAutoCompleteTextView.setAdapter(adapter)
+    fun updateItemList(itemList: List<ItemSpinner>) {
+        // To prevent item list build up, clear and then add all items
+        mSpinnerItemList.clear()
+        mSpinnerItemList.addAll(itemList)
     }
 
     /**
@@ -176,11 +190,20 @@ internal class SearchableView : RelativeLayout{
      * @param selectedItem - Currently selected item
      */
     fun setSelectedItem(selectedItem: ItemSpinner) {
+        println("meco lise")
+        // Visually set selected item on each selection. Otherwise RecyclerView will recycle view from upper items
+        setAutoCompleteText(selectedItem.toString(), false)
+
         mSelectedItem = selectedItem
         mSpinnerItemSelectedListener?.onItemSelected(mSelectedItem)
 
         // This is necessary to make AutoCompleteTextView uneditable when item selected from AutoCompleteTextView's options list
         closeSearchIfOpen()
+    }
+
+    // Returns selected item
+    fun getSelectedItem(): ItemSpinner{
+        return mSelectedItem
     }
 
     // Returns weather SearchableView is open or not. Namely, search by typing is possible or not

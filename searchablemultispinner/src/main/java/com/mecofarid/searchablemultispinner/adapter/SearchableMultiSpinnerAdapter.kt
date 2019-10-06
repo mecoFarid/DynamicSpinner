@@ -19,12 +19,22 @@ import com.mecofarid.searchablemultispinner.view.SearchableView
 class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val mOuterSpinnerItemClickedListener: SpinnerItemSelectedListener):
     RecyclerView.Adapter<SearchableMultiSpinnerAdapter.ViewHolder>() {
 
-    val hierarchicList = Utils.toHierarchicFlatList(nestedList, -1, 0)
-    /**
-     * Map ArrayAdapter to recyclerview's item position. This will ensure that we cache ArrayAdapter on each position instead
-     * of recreating it, every time [onBindViewHolder] is called
-     */
-    val hierarchicArrayAdapterSet = HashMap<Int, ArrayAdapter<ItemSpinner>>()
+    var mParentId = -1L
+
+    val mHierarchicList = Utils.toHierarchicFlatList(nestedList, -1, 0)
+
+    // RecyclerView that observes this adapter
+    var mRecyclerView: RecyclerView? =null
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        mRecyclerView = recyclerView
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        mRecyclerView = null
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_spinner, parent, false)
@@ -32,48 +42,49 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
     }
 
     override fun getItemCount(): Int {
-        return hierarchicList.size
+        return mHierarchicList.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, i: Int) {
-        val position = holder.adapterPosition
-        val context = holder.searchableView.context
-        holder.bind(getArrayAdapterAtOrCreate(position, context))
+        getSubCategoryOf(holder.adapterPosition, mParentId)?.let {
+            holder.bind(it.filterNotNull())
+        }
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal val searchableView = itemView.findViewById<SearchableView>(R.id.searchable_view)
         init {
-            // Physical click on SearchableView will open dop-down selection list
-            searchableView.setOnClickListener {
-                searchableView.showDropDownIfSearchNotOpen()
-            }
-
             // Detect automatic SearchableView item selection
             searchableView.setOnSpinnerItemSelectedListener(object: SpinnerItemSelectedListener{
                 override fun onItemSelected(itemSpinner: ItemSpinner) {
+                    mParentId = itemSpinner.id
+
                     mOuterSpinnerItemClickedListener.onItemSelected(itemSpinner)
                     notifyItemsBelow(adapterPosition)
                 }
 
             })
         }
-
-        fun bind(adapter: ArrayAdapter<ItemSpinner>){
-            searchableView.setAutoCompleteAdapter(adapter)
-            println("mecod upd")
+        fun bind(itemList: List<ItemSpinner>) {
+            searchableView.updateItemList(itemList)
+            mRecyclerView?.post {
+                if (itemList.isNotEmpty()) {
+                    searchableView.setSelectedItem(itemList[0])
+                }
+            }
         }
     }
 
-    private fun getArrayAdapterAtOrCreate(position: Int, context: Context): ArrayAdapter<ItemSpinner> {
-        hierarchicArrayAdapterSet[position]?.let {
-            return it
+    /**
+     * Returns subcategory for selected [ItemSpinner] of [SearchableView]
+     *
+     * @param position - Position of RecyclerView item
+     * @param parentId - Id of parent category
+     */
+    private fun getSubCategoryOf(position: Int, parentId: Long): List<ItemSpinner?>?{
+        return mHierarchicList[position].filter {
+            it.parentId == parentId
         }
-        hierarchicArrayAdapterSet[position] = ArrayAdapter(context, R.layout.support_simple_spinner_dropdown_item,
-            hierarchicList[position])
-
-        // Can never be null because above we already set a value if value is null
-        return hierarchicArrayAdapterSet[position]!!
     }
 
     /**

@@ -28,6 +28,13 @@ class Unit: ItemSpinner(){
     var equipType: List<EquipType>? = null
     var unitId: String? = null
     var unitName: String? = null
+    override fun toString(): String {
+        unitName?.let {
+            return it
+        }
+
+        return ""
+    }
 }
 
 class EquipType: ItemSpinner(){
@@ -35,10 +42,26 @@ class EquipType: ItemSpinner(){
     var equip: Equip? = null
     var equipTypeId: String? = null
     var name: String? = null
+
+    override fun toString(): String {
+        name?.let {
+            return it
+        }
+
+        return ""
+    }
 }
 
 class Equip: ItemSpinner(){
     var equipId: String? = null
     var equipNumber: String? = null
     var service: String? = null
+
+    override fun toString(): String {
+        service?.let {
+            return it
+        }
+
+        return ""
+    }
 }

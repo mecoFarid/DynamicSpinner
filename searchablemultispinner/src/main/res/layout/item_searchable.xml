@@ -14,7 +14,7 @@
         android:paddingBottom="@dimen/dimension_8dp"
         android:src="@drawable/ic_open_search"/>
 
-    <com.mecofarid.searchablemultispinner.view.AnapticAutoCompleteTextView
+    <androidx.appcompat.widget.AppCompatAutoCompleteTextView
         android:id="@+id/autocomplete_textview"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
