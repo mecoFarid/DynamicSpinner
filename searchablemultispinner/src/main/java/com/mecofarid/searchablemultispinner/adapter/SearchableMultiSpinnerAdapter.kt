@@ -19,7 +19,7 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
 
     var mParentId = -1L
 
-    val mHierarchicList = Utils.toHierarchicFlatList(nestedList, -1, 0)
+    val mHierarchicList = Utils.parseToHierarchicFlatList(nestedList, -1, 0)
 
     // RecyclerView that observes this adapter
     var mRecyclerView: RecyclerView? =null

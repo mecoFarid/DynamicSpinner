@@ -1,8 +1,5 @@
 package com.mecofarid.searchablemultispinner.util
 
-import android.content.Context
-import android.widget.ArrayAdapter
-import androidx.annotation.IntegerRes
 import com.mecofarid.searchablemultispinner.annotation.SubCategory
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
 import java.lang.reflect.Field
@@ -50,21 +47,21 @@ import java.lang.reflect.Field
 class Utils {
     companion object {
 
-        val sFieldSet = HashMap<Class<*>, Array<Field>>()
-        val sPairedFieldSet = HashMap<Class<*>, Map<Field, Field>>()
+        private val sFieldSet = HashMap<Class<*>, Array<Field>>()
+        private val sPairedFieldSet = HashMap<Class<*>, Map<Field, Field>>()
 
-        var itemId: Long = -1
+        private var itemId: Long = -1
 
         /**
          * First time passed parameters should be as follows: id = -1, parentId = -1, level = 0
-         * Converts nested [inputList] to hierarchic flat list of items
+         * Converts nested [nestedList] to hierarchic flat list of items
          *
-         * @param inputList - The nested list
+         * @param nestedList - The nested list
          * @param parentId - Id of parent item in flat list. Since returned list is flat, we have to keep reference
          * to parents in nested list
          * @param level - Category level of current item
          */
-        fun toHierarchicFlatList(
+        internal fun parseToHierarchicFlatList(
             nestedList: List<ItemSpinner>,
             parentId: Long,
             level: Int
@@ -73,7 +70,7 @@ class Utils {
 
             getFlatList(nestedList, parentId, level).forEach { itemSpinner ->
                 hierarchicList.apply {
-                    elementAtOrNull(itemSpinner.level)?.let { innerList ->
+                    this.elementAtOrNull(itemSpinner.level)?.let { innerList ->
                         innerList.add(itemSpinner)
                         // continue to next item otherwise `add(arrayListOf(itemSpinner))` will be executed and add
                         // unnecessary hierarchy
@@ -93,7 +90,7 @@ class Utils {
          * to parents in nested list
          * @param level - Category level of current item
          */
-        fun getFlatList(
+        private fun getFlatList(
             nestedList: List<ItemSpinner>,
             parentId: Long,
             level: Int
@@ -106,7 +103,7 @@ class Utils {
                 item.level = level
 
                 // Add current item to list to be returned to calling function
-                outputList.add(cloneObjectWithoutSubcategory(item))
+                outputList.add(cloneObjectExceptAnnotatedField(item, SubCategory::class.java))
 
                 getSubcategory<List<ItemSpinner>>(item)?.let { itemList ->
 
@@ -136,9 +133,11 @@ class Utils {
         /**
          * @param sourceObject Object to be copied to another object except field annotated with [SubCategory]
          */
-        private fun cloneObjectWithoutSubcategory(sourceObject: ItemSpinner): ItemSpinner {
-            val targetObject =
-                Class.forName(sourceObject.javaClass.name).getConstructor().newInstance()
+        private inline fun <reified T: Any>  cloneObjectExceptAnnotatedField(
+            sourceObject: T,
+            exceptionAnnotation: Class<out Annotation>
+        ): T {
+            val targetObject = Class.forName(sourceObject.javaClass.name).getConstructor().newInstance()
             val pairedFieldSet = getPairedFields(sourceObject.javaClass, targetObject.javaClass)
 
             pairedFieldSet.keys.forEach { targetField ->
@@ -148,13 +147,13 @@ class Utils {
                             targetField,
                             targetObject,
                             sourceValue,
-                            SubCategory::class.java
+                            exceptionAnnotation
                         )
                     }
                 }
             }
 
-            return targetObject as ItemSpinner
+            return targetObject as T
         }
 
         /**
@@ -163,14 +162,16 @@ class Utils {
          * @param target - Target class
          * @param source - Source class
          *
-         * Will never return null because [getMappedFieldSet] never returns null
+         * Will never return null because [mapCorrespondingFields] never returns null
          */
         private fun getPairedFields(source: Class<*>, target: Class<*>): Map<Field, Field> {
-            if (sPairedFieldSet[target] == null) {
-                val pairedFieldSet = getMappedFieldSet(source, target)
-                sPairedFieldSet[target] = pairedFieldSet
+            sPairedFieldSet[target]?.let {
+                return it
             }
-            return sPairedFieldSet[target]!!
+
+            val pairedFieldSet = mapCorrespondingFields(source, target)
+            sPairedFieldSet[target] = pairedFieldSet
+            return sPairedFieldSet.getOrElse(target,{pairedFieldSet})
         }
 
         /**
@@ -179,11 +180,11 @@ class Utils {
          * @param target - Target class
          * @param source - Source class
          */
-        private fun getMappedFieldSet(
+        private fun mapCorrespondingFields(
             source: Class<*>,
             target: Class<*>
         ): Map<Field, Field> {
-            val pairedFields = HashMap<Field, Field>()
+            val mappedFields = HashMap<Field, Field>()
             val sourceFieldList = getFields(source)
             val targetFieldList = getFields(target)
 
@@ -192,11 +193,11 @@ class Utils {
                     targetField,
                     sourceFieldList
                 )?.let { correspondingSourceField ->
-                    pairedFields[targetField] = correspondingSourceField
+                    mappedFields[targetField] = correspondingSourceField
                 }
             }
 
-            return pairedFields
+            return mappedFields
         }
 
         /**
@@ -205,17 +206,19 @@ class Utils {
          */
         private fun getFields(clazz: Class<*>): Array<Field> {
             // Check if that classes fields are in cache use them other wise add them
-            if (sFieldSet[clazz] == null) {
-                val classFields = clazz.declaredFields
-                val rootParentFields = clazz.superclass?.declaredFields
-                    ?: throw ClassNotFoundException(
-                        "$clazz must extends ${clazz.superclass}. For more info, " +
-                                "check library's README.md here https://github.com/mecoFarid/SearchableMultiSpinner"
-                    )
-                val allFields = arrayOf(*classFields, *rootParentFields)
-                sFieldSet[clazz] = allFields
+            sFieldSet[clazz]?.let {
+                return it
             }
-            return sFieldSet[clazz]!!
+
+            val classFields = clazz.declaredFields
+            val rootParentFields = clazz.superclass?.declaredFields
+                ?: throw ClassNotFoundException(
+                    "$clazz must extends ${clazz.superclass}. For more info, " +
+                            "check library's README.md here https://github.com/mecoFarid/SearchableMultiSpinner"
+                )
+            val allFields = arrayOf(*classFields, *rootParentFields)
+            sFieldSet[clazz] = allFields
+            return sFieldSet.getOrElse(clazz, {allFields})
         }
 
 
@@ -237,7 +240,6 @@ class Utils {
             return null
         }
 
-
         /**
          * Check if [field] is annotated with [annotation]
          *
@@ -246,17 +248,6 @@ class Utils {
          */
         private fun isAnnotatedWith(field: Field, annotation: Class<out Annotation>) =
             field.isAnnotationPresent(annotation)
-
-        /**
-         * Get value of [sourceField] from [source] object that is being copied
-         *
-         * @param sourceField - Field of a source object
-         * @param source - Source object
-         */
-        private fun getValue(sourceField: Field, source: Any): Any? {
-            sourceField.isAccessible = true
-            return sourceField.get(source)
-        }
 
         /**
          * Set [sourceValue] to corresponding [targetField] of [target] object
@@ -286,6 +277,17 @@ class Utils {
         private fun setValue(targetField: Field, target: Any, sourceValue: Any) {
             targetField.isAccessible = true
             targetField.set(target, sourceValue)
+        }
+
+        /**
+         * Get value of [sourceField] from [source] object that is being copied
+         *
+         * @param sourceField - Field of a source object
+         * @param source - Source object
+         */
+        private fun getValue(sourceField: Field, source: Any): Any? {
+            sourceField.isAccessible = true
+            return sourceField.get(source)
         }
     }
 }
