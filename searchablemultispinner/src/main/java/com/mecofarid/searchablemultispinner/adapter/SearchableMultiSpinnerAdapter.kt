@@ -1,10 +1,8 @@
 package com.mecofarid.searchablemultispinner.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.mecofarid.searchablemultispinner.R
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
@@ -66,11 +64,15 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
             })
         }
         fun bind(itemList: List<ItemSpinner>) {
-            searchableView.updateItemList(itemList)
-            mRecyclerView?.post {
-                if (itemList.isNotEmpty()) {
+            if (itemList.isNotEmpty()) {
+                expandViewIfCollapsed(itemView)
+                searchableView.updateItemList(itemList)
+                mRecyclerView?.post {
                     searchableView.setSelectedItem(itemList[0])
+
                 }
+            }else{
+                collapseViewIfExpanded(itemView)
             }
         }
     }
@@ -95,6 +97,42 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
         for (position in currentPosition+1..itemCount){
             notifyItemChanged(position)
         }
+    }
+
+    /**
+     * Will expand view. Height will be set to `LayoutParams.WRAP_CONTENT`
+     *
+     * @param view - View to be expanded
+     */
+    private fun expandViewIfCollapsed(view: View){
+        if (isCollapsed(view)) {
+            val layoutParams = view.layoutParams
+            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            view.layoutParams = layoutParams
+        }
+    }
+
+    /**
+     * Will collapse view. Height will be set to `0`
+     *
+     * @param view - View to be collapsed/expanded
+     * @param collpase - Decide whether view wil be collpased or expanded
+     */
+    private fun collapseViewIfExpanded(view: View){
+        if (isCollapsed(view).not()) {
+            val layoutParams = view.layoutParams
+            layoutParams.height = 0
+            view.layoutParams = layoutParams
+        }
+    }
+
+    /**
+     *
+     *Check if view is collapsed. Height `0` means collapsed
+     * @param view - View to check height
+     */
+    private fun isCollapsed(view: View): Boolean{
+        return view.layoutParams.height == 0
     }
 
     // Listener to notify classes (that implement this interface) when item selected

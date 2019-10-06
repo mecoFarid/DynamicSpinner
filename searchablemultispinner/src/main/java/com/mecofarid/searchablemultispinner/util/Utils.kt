@@ -127,7 +127,7 @@ class Utils {
         private inline fun <reified T> getSubcategory(obj: ItemSpinner): T? {
             getFields(obj.javaClass).forEach {
                 if (isAnnotatedWith(it, SubCategory::class.java)) {
-                    return it.get(obj) as T
+                    return it.get(obj) as? T
                 }
             }
             return null

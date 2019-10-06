@@ -12,9 +12,4 @@
         android:layout_height="wrap_content"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
-    <androidx.appcompat.widget.AppCompatAutoCompleteTextView
-        android:id="@+id/lete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
