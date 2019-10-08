@@ -8,7 +8,6 @@ import com.mecofarid.searchablemultispinner.R
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
 import com.mecofarid.searchablemultispinner.util.ListParserUtils
 import com.mecofarid.searchablemultispinner.view.SearchableView
-import java.util.logging.Handler
 
 /**
  * @param nestedList - This is nested list
@@ -56,7 +55,7 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
             // Detect automatic SearchableView item selection
             searchableView.setOnSpinnerItemSelectedListener(object: SpinnerItemSelectedListener{
                 override fun onItemSelected(itemSpinner: ItemSpinner) {
-                    mParentId = itemSpinner.id
+                    mParentId = itemSpinner.itemSpinnerId
 
                     mOuterSpinnerItemClickedListener.onItemSelected(itemSpinner)
                     notifyItemsBelow(adapterPosition)
@@ -86,7 +85,7 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
      */
     private fun getSubCategoryOf(position: Int, parentId: Long): List<ItemSpinner?>?{
         return mHierarchicList[position].filter {
-            it.parentId == parentId
+            it.itemSpinnerParentId == parentId
         }
     }
 

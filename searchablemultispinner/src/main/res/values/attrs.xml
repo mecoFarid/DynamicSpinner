@@ -3,6 +3,9 @@
     <declare-styleable name="SearchableView">
         <attr name="ss_icon_closeSearchview"/>
         <attr name="ss_icon_openSearchview"/>
+        <attr name="ss_iconColor_closeSearchview"/>
+        <attr name="ss_iconColor_openSearchview"/>
+        <attr name="ss_searchable"/>
     </declare-styleable>
 
     <declare-styleable name="SpinnerView">

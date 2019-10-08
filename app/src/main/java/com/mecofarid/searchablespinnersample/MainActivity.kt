@@ -3,10 +3,12 @@ package com.mecofarid.searchablespinnersample
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.ArrayAdapter
 import com.google.gson.Gson
 import com.mecofarid.searchablemultispinner.adapter.SearchableMultiSpinnerAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
+import com.mecofarid.searchablemultispinner.view.SearchableView
 
 
 class MainActivity : AppCompatActivity(), SearchableMultiSpinnerAdapter.SpinnerItemSelectedListener{
@@ -23,10 +25,17 @@ class MainActivity : AppCompatActivity(), SearchableMultiSpinnerAdapter.SpinnerI
             val adapter = SearchableMultiSpinnerAdapter(list, this)
             multi_spinner.adapter = adapter
         }
+
+
+//        val a = SearchableView(this)
+//        a.setSelectedItem()
+//        a.setOnSpinnerItemSelectedListener()
+//        a.updateItemList()
+//        a.setSt
     }
 
     override fun onItemSelected(itemSpinner: ItemSpinner) {
-        Log.d("Selected item id: ", itemSpinner.id.toString())
+        Log.d("Selected item id: ", itemSpinner.itemSpinnerId.toString())
     }
 
 }

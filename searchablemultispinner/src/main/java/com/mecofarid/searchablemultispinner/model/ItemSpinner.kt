@@ -4,14 +4,14 @@ import org.jetbrains.annotations.TestOnly
 
 open class ItemSpinner {
 
-    var level: Int = 0
-    var id: Long = -1L
-    var parentId = -1L
+    var itemSpinnerLevel: Int = 0
+    var itemSpinnerId: Long = -1L
+    var itemSpinnerParentId = -1L
 
     @TestOnly
     override fun equals(other: Any?): Boolean {
         other?.let {
-            return  (other as ItemSpinner).id == this.id
+            return  (other as ItemSpinner).itemSpinnerId == this.itemSpinnerId
         }
 
         return false

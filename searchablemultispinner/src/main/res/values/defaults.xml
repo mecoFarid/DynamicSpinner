@@ -6,6 +6,8 @@
     <color name="color_close_searchview_icon">#848484</color>
     <color name="color_open_searchview_icon">#848484</color>
 
+    <bool name="is_searchable">true</bool>
+
     <style name="DefaultSpinnerView" parent="CardView">
         <item name="cardCornerRadius">@dimen/cardview_default_radius</item>
         <item name="cardElevation">@dimen/cardview_default_elevation</item>

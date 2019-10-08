@@ -1,12 +1,9 @@
 package com.mecofarid.searchablemultispinner.util
 
-import android.app.Activity
 import com.mecofarid.searchablemultispinner.annotation.SubCategory
-import com.mecofarid.searchablemultispinner.annotation.SubHell
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
 import java.lang.ClassCastException
 import java.lang.reflect.Field
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -76,7 +73,7 @@ internal class ListParserUtils {
 
             getFlatList(nestedList, parentId, level).forEach { itemSpinner ->
                 hierarchicList.apply {
-                    this.elementAtOrNull(itemSpinner.level)?.let { innerList ->
+                    this.elementAtOrNull(itemSpinner.itemSpinnerLevel)?.let { innerList ->
                         innerList.add(itemSpinner)
                         // continue to next item otherwise `add(arrayListOf(itemSpinner))` will be executed and add
                         // unnecessary hierarchy
@@ -109,9 +106,9 @@ internal class ListParserUtils {
             val outputList = ArrayList<ItemSpinner>()
             nestedList.forEach { item ->
                 sItemId++
-                item.id = sItemId
-                item.parentId = parentId
-                item.level = level
+                item.itemSpinnerId = sItemId
+                item.itemSpinnerParentId = parentId
+                item.itemSpinnerLevel = level
 
                 // Add current item to list to be returned to calling function
                 outputList.add(cloneObjectExceptAnnotatedField(item, SubCategory::class.java))
@@ -131,15 +128,22 @@ internal class ListParserUtils {
             return outputList;
         }
 
-        // Return subcategory
+        /**
+         * Return subcategory of given object
+         *
+         * @param obj - Subcategory of this object will be returned
+         */
         private inline fun <reified T> getSubcategory(obj: ItemSpinner): T? {
             getFields(obj.javaClass).forEach {
                 if (it.isAnnotationPresent(SubCategory::class.java)) {
                     /**
-                     * If field is annotated with [SubCategory] it should be of type List<ItemSpinner>
+                     * If field is annotated with [SubCategory] it should be of type List
                      */
-                    return kotlin.runCatching {  it.get(obj) as T}.getOrNull()
-                        ?: throw ClassCastException("$it cannot be cast to ${T::class.java}")
+                    kotlin.runCatching { return it.get(obj) as T? }.getOrNull()
+                        ?: throw ClassCastException(
+                            "$it cannot be cast to ${T::class.java} " +
+                                    "make sure you annotated correct field with ${SubCategory::class.java}"
+                        )
                 }
             }
             return null
@@ -155,8 +159,10 @@ internal class ListParserUtils {
             val targetObject = kotlin.runCatching {
                 Class.forName(sourceObject.javaClass.name).getConstructor().newInstance()
             }.getOrNull()
-                ?: throw NoSuchMethodException("${sourceObject::class.java} has no zero argument constructor."
-                        + " If you're using Kotlin Data Classes. Check here https://kotlinlang.org/docs/reference/data-classes.html#data-classes")
+                ?: throw NoSuchMethodException(
+                    "${sourceObject::class.java} has no zero argument constructor. If you're using Kotlin Data Classes, " +
+                            "check here https://kotlinlang.org/docs/reference/data-classes.html#data-classes"
+                )
             val pairedFieldSet = getPairedFields(sourceObject.javaClass, targetObject.javaClass)
 
             pairedFieldSet.keys.forEach { targetField ->

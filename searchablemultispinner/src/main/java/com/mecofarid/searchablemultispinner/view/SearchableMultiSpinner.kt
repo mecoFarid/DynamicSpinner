@@ -20,7 +20,7 @@ class SearchableMultiSpinner: RecyclerView {
         init(context)
     }
 
-    internal fun init(context: Context) {
+    private fun init(context: Context) {
         layoutManager = LinearLayoutManager(context)
     }
 }

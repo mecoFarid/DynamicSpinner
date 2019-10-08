@@ -3,7 +3,6 @@ package com.mecofarid.searchablemultispinner.util
 import com.google.gson.Gson
 import com.mecofarid.searchablemultispinner.getJson
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
-import org.junit.Before
 import org.junit.Test
 
 class UtilTest {
@@ -67,7 +66,7 @@ class UtilTest {
                 innerList.forEach { item ->
 
                     // Assert all objects at index `n` is of level `n`
-                    assert(item.level == this.indexOf(innerList))
+                    assert(item.itemSpinnerLevel == this.indexOf(innerList))
                 }
             }
         }
