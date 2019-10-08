@@ -1,8 +1,14 @@
 package com.mecofarid.searchablemultispinner.util
 
+import android.app.Activity
 import com.mecofarid.searchablemultispinner.annotation.SubCategory
+import com.mecofarid.searchablemultispinner.annotation.SubHell
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
+import java.lang.ClassCastException
 import java.lang.reflect.Field
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 /**
@@ -44,13 +50,13 @@ import java.lang.reflect.Field
       |__ equipment 1, equipment 2, equipment 3, equipment 4.......
 */
 
-class Utils {
+internal class ListParserUtils {
     companion object {
 
         private val sFieldSet = HashMap<Class<*>, Array<Field>>()
         private val sPairedFieldSet = HashMap<Class<*>, Map<Field, Field>>()
 
-        private var itemId: Long = -1
+        private var sItemId: Long = -1
 
         /**
          * First time passed parameters should be as follows: id = -1, parentId = -1, level = 0
@@ -79,6 +85,11 @@ class Utils {
                     add(arrayListOf(itemSpinner))
                 }
             }
+            /**
+             * Reset static fields before returning results otherwise will
+             * cause @see <a href =https://github.com/mecoFarid/SearchableMultiSpinner/issues/2>Issue 2</a>
+             */
+            resetStaticFileds()
             return hierarchicList
         }
 
@@ -97,8 +108,8 @@ class Utils {
         ): List<ItemSpinner> {
             val outputList = ArrayList<ItemSpinner>()
             nestedList.forEach { item ->
-                itemId++
-                item.id = itemId
+                sItemId++
+                item.id = sItemId
                 item.parentId = parentId
                 item.level = level
 
@@ -111,7 +122,7 @@ class Utils {
                     outputList.addAll(
                         getFlatList(
                             itemList,
-                            itemId,
+                            sItemId,
                             level + 1
                         )
                     )
@@ -123,8 +134,12 @@ class Utils {
         // Return subcategory
         private inline fun <reified T> getSubcategory(obj: ItemSpinner): T? {
             getFields(obj.javaClass).forEach {
-                if (isAnnotatedWith(it, SubCategory::class.java)) {
-                    return it.get(obj) as? T
+                if (it.isAnnotationPresent(SubCategory::class.java)) {
+                    /**
+                     * If field is annotated with [SubCategory] it should be of type List<ItemSpinner>
+                     */
+                    return kotlin.runCatching {  it.get(obj) as T}.getOrNull()
+                        ?: throw ClassCastException("$it cannot be cast to ${T::class.java}")
                 }
             }
             return null
@@ -137,7 +152,11 @@ class Utils {
             sourceObject: T,
             exceptionAnnotation: Class<out Annotation>
         ): T {
-            val targetObject = Class.forName(sourceObject.javaClass.name).getConstructor().newInstance()
+            val targetObject = kotlin.runCatching {
+                Class.forName(sourceObject.javaClass.name).getConstructor().newInstance()
+            }.getOrNull()
+                ?: throw NoSuchMethodException("${sourceObject::class.java} has no zero argument constructor."
+                        + " If you're using Kotlin Data Classes. Check here https://kotlinlang.org/docs/reference/data-classes.html#data-classes")
             val pairedFieldSet = getPairedFields(sourceObject.javaClass, targetObject.javaClass)
 
             pairedFieldSet.keys.forEach { targetField ->
@@ -152,7 +171,6 @@ class Utils {
                     }
                 }
             }
-
             return targetObject as T
         }
 
@@ -213,7 +231,7 @@ class Utils {
             val classFields = clazz.declaredFields
             val rootParentFields = clazz.superclass?.declaredFields
                 ?: throw ClassNotFoundException(
-                    "$clazz must extends ${clazz.superclass}. For more info, " +
+                    "${clazz::class.java} must extends ${ItemSpinner::class.java}. For more info, " +
                             "check library's README.md here https://github.com/mecoFarid/SearchableMultiSpinner"
                 )
             val allFields = arrayOf(*classFields, *rootParentFields)
@@ -241,15 +259,6 @@ class Utils {
         }
 
         /**
-         * Check if [field] is annotated with [annotation]
-         *
-         * @param field - Field
-         * @param annotation - Annotation
-         */
-        private fun isAnnotatedWith(field: Field, annotation: Class<out Annotation>) =
-            field.isAnnotationPresent(annotation)
-
-        /**
          * Set [sourceValue] to corresponding [targetField] of [target] object
          * @param sourceValue - Source value
          * @param targetField - Target field that corresponds field of source value
@@ -262,7 +271,7 @@ class Utils {
             sourceValue: Any,
             exceptionAnnotation: Class<out Annotation>
         ) {
-            if (isAnnotatedWith(targetField, exceptionAnnotation).not()) {
+            if (targetField.isAnnotationPresent(exceptionAnnotation).not()) {
                 setValue(targetField, target, sourceValue)
             }
         }
@@ -288,6 +297,21 @@ class Utils {
         private fun getValue(sourceField: Field, source: Any): Any? {
             sourceField.isAccessible = true
             return sourceField.get(source)
+        }
+
+        // Reset static fieled to default values
+        private fun resetStaticFileds(){
+            sItemId = -1
+            with(sFieldSet.iterator()){
+                forEach { _ ->
+                    remove()
+                }
+            }
+            with(sPairedFieldSet.iterator()){
+                forEach { _ ->
+                    remove()
+                }
+            }
         }
     }
 }

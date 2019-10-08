@@ -1,9 +1,9 @@
-package com.mecofarid.searchablemultispinner
+package com.mecofarid.searchablemultispinner.util
 
 import com.mecofarid.searchablemultispinner.annotation.SubCategory
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
 
-class TestModel: ItemSpinner(){
+class ConventionalModel: ItemSpinner(){
     var plant: List<Plant>? = null
 
 }
@@ -25,7 +25,7 @@ class Plant: ItemSpinner(){
 
 class Unit: ItemSpinner(){
     @SubCategory
-    var equipType: List<EquipType>? = null
+    var equipType: List<Equip>? = null
     var unitId: String? = null
     var unitName: String? = null
     override fun toString(): String {
@@ -37,9 +37,9 @@ class Unit: ItemSpinner(){
     }
 }
 
-class EquipType: ItemSpinner(){
+class Equip: ItemSpinner(){
 
-    var equip: Equip? = null
+    var equip: EquipType? = null
     var equipTypeId: String? = null
     var name: String? = null
 
@@ -52,7 +52,7 @@ class EquipType: ItemSpinner(){
     }
 }
 
-class Equip: ItemSpinner(){
+class EquipType: ItemSpinner(){
     var equipId: String? = null
     var equipNumber: String? = null
     var service: String? = null

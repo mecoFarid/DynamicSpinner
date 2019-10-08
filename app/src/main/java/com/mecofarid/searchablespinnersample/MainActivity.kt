@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity(), SearchableMultiSpinnerAdapter.SpinnerI
             val adapter = SearchableMultiSpinnerAdapter(list, this)
             multi_spinner.adapter = adapter
         }
-
     }
 
     override fun onItemSelected(itemSpinner: ItemSpinner) {

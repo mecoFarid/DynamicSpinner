@@ -6,8 +6,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.mecofarid.searchablemultispinner.R
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
-import com.mecofarid.searchablemultispinner.util.Utils
+import com.mecofarid.searchablemultispinner.util.ListParserUtils
 import com.mecofarid.searchablemultispinner.view.SearchableView
+import java.util.logging.Handler
 
 /**
  * @param nestedList - This is nested list
@@ -19,7 +20,7 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
 
     var mParentId = -1L
 
-    val mHierarchicList = Utils.parseToHierarchicFlatList(nestedList, -1, 0)
+    val mHierarchicList = ListParserUtils.parseToHierarchicFlatList(nestedList, -1, 0)
 
     // RecyclerView that observes this adapter
     var mRecyclerView: RecyclerView? =null
