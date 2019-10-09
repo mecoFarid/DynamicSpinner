@@ -6,15 +6,16 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.cardview.widget.CardView
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
 import com.mecofarid.searchablemultispinner.R
 import com.mecofarid.searchablemultispinner.adapter.SearchableMultiSpinnerAdapter.SpinnerItemSelectedListener
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
 
 
-class SearchableView : CardView{
+class SearchableView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0) : CardView(context, attrs, defStyleAttr) {
 
     enum class Selection {
         START,
@@ -25,9 +26,9 @@ class SearchableView : CardView{
     private val mSpinnerItemList: ArrayList<ItemSpinner> = ArrayList()
     private var mSpinnerItemSelectedListener: SpinnerItemSelectedListener? = null
     private lateinit var mSelectedItem: ItemSpinner
-    private lateinit var mAutoCompleteTextView: AutoCompleteTextView
-    private lateinit var mOpenSearchViewIcon: ImageView
-    private lateinit var mCloseSearchViewIcon: ImageView
+    private var mAutoCompleteTextView: AutoCompleteTextView
+    private var mOpenSearchViewIcon: ImageView
+    private var mCloseSearchViewIcon: ImageView
     private var mInputMethodManager: InputMethodManager? = null
 
     // Defines if the spinner is both (searchable and selectable) or only selectable
@@ -36,34 +37,56 @@ class SearchableView : CardView{
     // Whether AutoCompleteTextView is editable or not
     private var mIsSearchOpen = false
 
-    constructor(context: Context) : super(context) {
-        init(context)
-    }
-
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        init(context)
-    }
-
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr) {
-        init(context)
-    }
-
     // Initializes basic built-in functionality of SearchableView
-    private fun init(context: Context) {
+    init {
         mInputMethodManager = ContextCompat.getSystemService(context, InputMethodManager::class.java)
 
+        //Initialize views
         val view = View.inflate(context, R.layout.item_searchable, null)
         mAutoCompleteTextView = view.findViewById(R.id.autocomplete_textview)
         mOpenSearchViewIcon = view.findViewById(R.id.search)
         mCloseSearchViewIcon = view.findViewById(R.id.close)
 
+        //Set values from attributes or default
+        with(context.obtainStyledAttributes(attrs, R.styleable.SearchableView, defStyleAttr, 0)){
+            setOpenSearchIcon(getResourceId(R.styleable.SearchableView_ss_icon_openSearchView,
+                R.drawable.ic_default_open_search))
+            setOpenSearchIconColor(getColor(R.styleable.SearchableView_ss_iconColor_openSearchView,
+                ContextCompat.getColor(context, R.color.default_color_open_searchview_icon)))
+
+            setCloseSearchIcon(getResourceId(R.styleable.SearchableView_ss_icon_closeSearchView,
+                R.drawable.ic_default_close_search))
+            setCloseSearchIconColor(getColor(R.styleable.SearchableView_ss_iconColor_closeSearcView,
+                ContextCompat.getColor(context, R.color.default_color_close_searchview_icon)))
+
+
+            cardElevation = resources.getDimension(R.dimen.default_cardview_elevation)
+            radius = resources.getDimension(R.dimen.default_cardview_radius)
+            useCompatPadding = resources.getBoolean(R.bool.uses_compat_padding)
+
+            recycle()
+        }
+
+
+        //Initializes adapter with empty item list
+        initializeAndSetAdpater()
+
+        // Handles all touch events on the view
+        handleTouchEvents()
+
+        // Handle all focus changes on the view
+        handleFocusChanges()
+
+        addView(view)
+    }
+
+    private fun initializeAndSetAdpater(){
         // Items will added later
         val arrayAdapter = ArrayAdapter(context, R.layout.support_simple_spinner_dropdown_item, mSpinnerItemList)
         mAutoCompleteTextView.setAdapter(arrayAdapter)
+    }
 
+    private fun handleTouchEvents(){
         mOpenSearchViewIcon.setOnClickListener { openSearchIfClosed() }
         mCloseSearchViewIcon.setOnClickListener { closeSearchIfOpen() }
         mAutoCompleteTextView.setOnItemClickListener { p0, p1, p2, p3 ->
@@ -72,7 +95,9 @@ class SearchableView : CardView{
         mAutoCompleteTextView.setOnClickListener {
             showDropDownIfSearchNotOpen()
         }
+    }
 
+    private fun handleFocusChanges(){
         // If focus changes that means other view gained focus then close the current spinner
         mAutoCompleteTextView.onFocusChangeListener =
             OnFocusChangeListener { _, focused ->
@@ -82,32 +107,6 @@ class SearchableView : CardView{
                     setAutoCompleteText(mSelectedItem.toString())
                 }
             }
-
-        addView(view)
-    }
-
-    /**
-     * Set appcompat padding for CardView
-     * @param applyCompatPadding - Apply compat padding if true
-     */
-    fun setViewRadius(applyCompatPadding: Boolean){
-        useCompatPadding = applyCompatPadding
-    }
-
-    /**
-     * Set radius for CardView
-     * @param radius - Radius to be applied
-     */
-    fun setViewRadius(radius: Float){
-        setRadius(radius)
-    }
-
-    /**
-     * Set elevation for CardView
-     * @param elevation - Elevation to be applied
-     */
-    fun setViewElevation(elevation: Float){
-        cardElevation = elevation
     }
 
     /**
@@ -120,21 +119,21 @@ class SearchableView : CardView{
 
     /**
      * Set OpenSearch_icon color
-     * @param resId - Resource ID
+     * @param color - Resource ID
      */
-    fun setOpenSearchIconColor(resId: Int){
+    fun setOpenSearchIconColor(color: Int){
         mOpenSearchViewIcon.apply {
-            setColorFilter(ActivityCompat.getColor(this.context, resId))
+            setColorFilter(color)
         }
     }
 
     /**
      * Set CloseSearch_icon color
-     * @param resId - Resource ID
+     * @param color - color
      */
-    fun setCloseSearchIconColor(resId: Int){
+    fun setCloseSearchIconColor(color: Int){
         mCloseSearchViewIcon.apply {
-            setColorFilter(ActivityCompat.getColor(this.context, resId))
+            setColorFilter(color)
         }
     }
 

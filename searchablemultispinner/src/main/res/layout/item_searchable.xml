@@ -11,8 +11,7 @@
         android:layout_centerVertical="true"
         android:paddingStart="@dimen/dimension_8dp"
         android:paddingTop="@dimen/dimension_8dp"
-        android:paddingBottom="@dimen/dimension_8dp"
-        android:src="@drawable/ic_open_search"/>
+        android:paddingBottom="@dimen/dimension_8dp"/>
 
     <androidx.appcompat.widget.AppCompatAutoCompleteTextView
         android:id="@+id/autocomplete_textview"
@@ -41,7 +40,6 @@
         android:visibility="gone"
         android:paddingEnd="@dimen/dimension_8dp"
         android:paddingTop="@dimen/dimension_8dp"
-        android:paddingBottom="@dimen/dimension_8dp"
-        android:src="@drawable/ic_close_search"/>
+        android:paddingBottom="@dimen/dimension_8dp"/>
 
 </RelativeLayout>

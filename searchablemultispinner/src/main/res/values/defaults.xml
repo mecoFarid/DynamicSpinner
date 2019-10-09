@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <drawable name="close_searchview_icon">@drawable/ic_close_search</drawable>
-    <drawable name="open_searchview_icon">@drawable/ic_open_search</drawable>
+    <drawable name="default_close_searchview_icon">@drawable/ic_default_close_search</drawable>
+    <drawable name="default_open_searchview_icon">@drawable/ic_default_open_search</drawable>
 
-    <color name="color_close_searchview_icon">#848484</color>
-    <color name="color_open_searchview_icon">#848484</color>
+    <color name="default_color_close_searchview_icon">#848484</color>
+    <color name="default_color_open_searchview_icon">#848484</color>
 
-    <bool name="is_searchable">true</bool>
+    <bool name="default_is_searchable">true</bool>
 
-    <style name="DefaultSpinnerView" parent="CardView">
-        <item name="cardCornerRadius">@dimen/cardview_default_radius</item>
-        <item name="cardElevation">@dimen/cardview_default_elevation</item>
-        <item name="cardUseCompatPadding">true</item>
-    </style>
+    <dimen name="default_cardview_elevation">@dimen/cardview_default_elevation</dimen>
+    <dimen name="default_cardview_radius">@dimen/cardview_default_radius</dimen>
+    <bool name="uses_compat_padding">true</bool>
 </resources>
