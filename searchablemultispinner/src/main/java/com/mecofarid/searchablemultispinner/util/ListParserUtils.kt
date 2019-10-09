@@ -65,7 +65,7 @@ internal class ListParserUtils {
          * @param level - Category level of current item
          */
         internal fun parseToHierarchicFlatList(
-            nestedList: List<ItemSpinner>,
+            nestedList: List<ItemSpinner?>,
             parentId: Long,
             level: Int
         ): List<List<ItemSpinner>> {
@@ -99,30 +99,32 @@ internal class ListParserUtils {
          * @param level - Category level of current item
          */
         private fun getFlatList(
-            nestedList: List<ItemSpinner>,
+            nestedList: List<ItemSpinner?>,
             parentId: Long,
             level: Int
         ): List<ItemSpinner> {
             val outputList = ArrayList<ItemSpinner>()
             nestedList.forEach { item ->
-                sItemId++
-                item.itemSpinnerId = sItemId
-                item.itemSpinnerParentId = parentId
-                item.itemSpinnerLevel = level
+                item?.let {
+                    sItemId++
+                    item.itemSpinnerId = sItemId
+                    item.itemSpinnerParentId = parentId
+                    item.itemSpinnerLevel = level
 
-                // Add current item to list to be returned to calling function
-                outputList.add(cloneObjectExceptAnnotatedField(item, SubCategory::class.java))
+                    // Add current item to list to be returned to calling function
+                    outputList.add(cloneObjectExceptAnnotatedField(item, SubCategory::class.java))
 
-                getSubcategory<List<ItemSpinner>>(item)?.let { itemList ->
+                    getSubcategory<List<ItemSpinner>>(item)?.let { itemList ->
 
-                    // Add subcategories to list to be returned to calling function
-                    outputList.addAll(
-                        getFlatList(
-                            itemList,
-                            sItemId,
-                            level + 1
+                        // Add subcategories to list to be returned to calling function
+                        outputList.addAll(
+                            getFlatList(
+                                itemList,
+                                sItemId,
+                                level + 1
+                            )
                         )
-                    )
+                    }
                 }
             }
             return outputList;

@@ -1,0 +1,94 @@
+{
+  "plant": [
+    {
+      "plantId": "",
+      "plantLocation": null,
+      "unit": [
+        {},
+        null,
+        {
+          "unitId": "2362",
+          "unitName": "CD_Commodity",
+          "equipType": [
+            {},
+            null
+          ]
+        },
+        {
+          "unitId": "2363",
+          "unitName": "CD_Loadout",
+          "equipType": [
+            {
+              "equipTypeId": "5491",
+              "name": "Tank",
+              "equip": {
+                "equipId": "31654",
+                "equipNumber": "TK-04",
+                "service": "Loadout Tank"
+              }
+            },
+            {
+              "equipTypeId": "5492",
+              "name": "Vessel",
+              "equip": {
+                "equipId": "31655",
+                "equipNumber": "V-04",
+                "service": "Loadout Vessel"
+              }
+            },
+            {
+              "equipTypeId": "5493",
+              "name": "RV"
+            }
+          ]
+        }
+      ]
+    },
+    {},
+    null,
+    {
+      "plantId": "2047",
+      "plantLocation": "Waynoka 2"
+    },
+    {
+      "plantId": "2048",
+      "plantLocation": "Coalgate"
+    },
+    {
+      "plantId": "2049",
+      "plantLocation": "Tupelo"
+    },
+    {
+      "plantId": "2050",
+      "plantLocation": "Atoka"
+    },
+    {
+      "plantId": "2051",
+      "plantLocation": "Velma"
+    },
+    {
+      "plantId": "2052",
+      "plantLocation": "Velma 60"
+    },
+    {
+      "plantId": "2053",
+      "plantLocation": "Mansfield"
+    },
+    {
+      "plantId": "2054",
+      "plantLocation": "Driver"
+    },
+    {
+      "plantId": "2055",
+      "plantLocation": "MidkiffCons"
+    },
+    {
+      "plantId": "2056",
+      "plantLocation": "Benedum"
+    },
+    {
+      "plantId": "2057",
+      "plantLocation": "Silver Oak"
+    }
+  ]
+}

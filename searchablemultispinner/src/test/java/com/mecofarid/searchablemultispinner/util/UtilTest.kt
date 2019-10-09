@@ -16,6 +16,15 @@ class UtilTest {
         assert(list.isNotEmpty())
     }
 
+    @Test
+    fun parseModifiedList_withConventionalModelClass() {
+        val list = ListParserUtils.parseToHierarchicFlatList(getNestedList<ConventionalModel>(
+            "modified.json").plant.orEmpty(), -1,0)
+
+        //Assert that list is not empty
+        assert(list.isNotEmpty())
+    }
+
     // Failure Test
     @Test
     fun failureTest_shouldThrowNoZeroArgumentConstructorException(){
