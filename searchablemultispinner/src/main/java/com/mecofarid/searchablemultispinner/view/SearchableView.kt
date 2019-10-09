@@ -17,9 +17,9 @@ class SearchableView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0) : CardView(context, attrs, defStyleAttr) {
 
-    enum class Selection {
-        START,
+    enum class SelectionMode {
         END,
+        START,
         ALL
     }
 
@@ -30,9 +30,7 @@ class SearchableView @JvmOverloads constructor(
     private var mOpenSearchViewIcon: ImageView
     private var mCloseSearchViewIcon: ImageView
     private var mInputMethodManager: InputMethodManager? = null
-
-    // Defines if the spinner is both (searchable and selectable) or only selectable
-    private var isSearchable = true
+    private lateinit var mTextSelectionMode: SelectionMode
 
     // Whether AutoCompleteTextView is editable or not
     private var mIsSearchOpen = false
@@ -59,6 +57,13 @@ class SearchableView @JvmOverloads constructor(
             setCloseSearchIconColor(getColor(R.styleable.SearchableView_ss_iconColor_closeSearcView,
                 ContextCompat.getColor(context, R.color.default_color_close_searchview_icon)))
 
+            /**
+             * Show/hide [mOpenSearchViewIcon] depending on whether view is searchable or not. Show if searchable, hide otherwise
+              */
+            mOpenSearchViewIcon.visibility = if (getBoolean(R.styleable.SearchableView_ss_isSearchable,
+                resources.getBoolean(R.bool.default_is_searchable))) View.VISIBLE else View.GONE
+
+            mTextSelectionMode = SelectionMode.values()[getInt(R.styleable.SearchableView_ss_textSelectionMode, 0)]
 
             cardElevation = resources.getDimension(R.dimen.default_cardview_elevation)
             radius = resources.getDimension(R.dimen.default_cardview_radius)
@@ -107,14 +112,6 @@ class SearchableView @JvmOverloads constructor(
                     setAutoCompleteText(mSelectedItem.toString())
                 }
             }
-    }
-
-    /**
-     * Defines if the spinner is both (searchable and selectable) or only selectable
-     * @param searchable - Searchable if true, not searchable otherwise
-     */
-    fun setSearchable(searchable: Boolean){
-        isSearchable = searchable
     }
 
     /**
@@ -195,7 +192,7 @@ class SearchableView @JvmOverloads constructor(
 
             if (requestFocus){
                 requestFocus()
-                setSelection(Selection.END)
+                setTextSelectionMode(mTextSelectionMode)
             }
         }
     }
@@ -203,11 +200,11 @@ class SearchableView @JvmOverloads constructor(
     /**
      * Sets selection of text when view focused (search is open)
      */
-    private fun setSelection(selection: Selection){
-        when(selection){
-            Selection.START -> mAutoCompleteTextView.setSelection(0)
-            Selection.END -> mAutoCompleteTextView.setSelection(mAutoCompleteTextView.text.toString().length)
-            Selection.ALL -> mAutoCompleteTextView.selectAll()
+    private fun setTextSelectionMode(selectionMode: SelectionMode){
+        when(selectionMode){
+            SelectionMode.START -> mAutoCompleteTextView.setSelection(0)
+            SelectionMode.END -> mAutoCompleteTextView.setSelection(mAutoCompleteTextView.text.toString().length)
+            SelectionMode.ALL -> mAutoCompleteTextView.selectAll()
         }
     }
 

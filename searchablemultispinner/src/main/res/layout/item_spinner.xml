@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.mecofarid.searchablemultispinner.view.SearchableView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/searchable_view"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" />
+    android:layout_height="wrap_content"
+    app:ss_isSearchable="true"
+    app:ss_iconColor_closeSearcView="@android:color/holo_blue_bright"
+    app:ss_iconColor_openSearchView="@android:color/holo_orange_dark"
+    app:ss_textSelectionMode="all"/>
+
+
