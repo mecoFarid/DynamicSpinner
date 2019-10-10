@@ -11,16 +11,28 @@ import com.mecofarid.searchablemultispinner.R
 import com.mecofarid.searchablemultispinner.adapter.SearchableMultiSpinnerAdapter.SpinnerItemSelectedListener
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
 
-
 class SearchableView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0) : CardView(context, attrs, defStyleAttr) {
 
-    enum class SelectionMode {
+    companion object{
+        const val TAG = "InternalSearchableViewTag"
+    }
+
+    private enum class SelectionMode {
         END,
         START,
         ALL
+    }
+
+    override fun getTag(): Any {
+        return TAG
+    }
+
+    override fun setTag(tag: Any?) {
+        if (tag != TAG) throw IllegalAccessException("Please refrain setting tag. Library is already using tag on this element")
+        else super.setTag(tag)
     }
 
     private val mSpinnerItemList: ArrayList<ItemSpinner> = ArrayList()
@@ -30,13 +42,16 @@ class SearchableView @JvmOverloads constructor(
     private var mOpenSearchViewIcon: ImageView
     private var mCloseSearchViewIcon: ImageView
     private var mInputMethodManager: InputMethodManager? = null
-    private lateinit var mTextSelectionMode: SelectionMode
+    private var mTextSelectionMode: SelectionMode
 
     // Whether AutoCompleteTextView is editable or not
     private var mIsSearchOpen = false
 
     // Initializes basic built-in functionality of SearchableView
     init {
+        // Set tag so view can be found with
+        tag = TAG
+
         mInputMethodManager = ContextCompat.getSystemService(context, InputMethodManager::class.java)
 
         //Initialize views

@@ -14,15 +14,18 @@ import com.mecofarid.searchablemultispinner.view.SearchableView
  * @param mOuterSpinnerItemClickedListener - The listener from outer class through which that class will be notified when
  * item selected
  */
-class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val mOuterSpinnerItemClickedListener: SpinnerItemSelectedListener):
-    RecyclerView.Adapter<SearchableMultiSpinnerAdapter.ViewHolder>() {
+class SearchableMultiSpinnerAdapter (
+        nestedList: List<ItemSpinner>,
+        private val mOuterSpinnerItemClickedListener: SpinnerItemSelectedListener,
+        private val layoutResId: Int
+    ): RecyclerView.Adapter<SearchableMultiSpinnerAdapter.ViewHolder>() {
 
     var mParentId = -1L
 
     val mHierarchicList = ListParserUtils.parseToHierarchicFlatList(nestedList, -1, 0)
 
     // RecyclerView that observes this adapter
-    var mRecyclerView: RecyclerView? =null
+    var mRecyclerView: RecyclerView? = null
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
@@ -35,7 +38,7 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_spinner, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(layoutResId, parent, false)
         return ViewHolder(view)
     }
 
@@ -50,10 +53,11 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal val searchableView = itemView.findViewById<SearchableView>(R.id.searchable_view)
+        internal val searchableView = itemView.findViewWithTag<SearchableView>(SearchableView.TAG)
+
         init {
             // Detect automatic SearchableView item selection
-            searchableView.setOnSpinnerItemSelectedListener(object: SpinnerItemSelectedListener{
+            searchableView.setOnSpinnerItemSelectedListener(object : SpinnerItemSelectedListener {
                 override fun onItemSelected(itemSpinner: ItemSpinner) {
                     mParentId = itemSpinner.itemSpinnerId
 
@@ -63,6 +67,7 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
 
             })
         }
+
         fun bind(itemList: List<ItemSpinner>) {
             if (itemList.isNotEmpty()) {
                 expandViewIfCollapsed(itemView)
@@ -71,7 +76,7 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
                     searchableView.setSelectedItem(itemList[0])
 
                 }
-            }else{
+            } else {
                 collapseViewIfExpanded(itemView)
             }
         }
@@ -83,7 +88,7 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
      * @param position - Position of RecyclerView item
      * @param parentId - Id of parent category
      */
-    private fun getSubCategoryOf(position: Int, parentId: Long): List<ItemSpinner?>?{
+    private fun getSubCategoryOf(position: Int, parentId: Long): List<ItemSpinner?>? {
         return mHierarchicList[position].filter {
             it.itemSpinnerParentId == parentId
         }
@@ -93,8 +98,8 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
      * Will update all RecyclerView items below item at [currentPosition]
      * @param currentPosition - Position of current RecyclerView item from which other views' update is requested
      */
-    private fun notifyItemsBelow(currentPosition: Int){
-        for (position in currentPosition+1..itemCount){
+    private fun notifyItemsBelow(currentPosition: Int) {
+        for (position in currentPosition + 1..itemCount) {
             notifyItemChanged(position)
         }
     }
@@ -104,7 +109,7 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
      *
      * @param view - View to be expanded
      */
-    private fun expandViewIfCollapsed(view: View){
+    private fun expandViewIfCollapsed(view: View) {
         if (isCollapsed(view)) {
             val layoutParams = view.layoutParams
             layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
@@ -118,7 +123,8 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
      * @param view - View to be collapsed/expanded
      * @param collpase - Decide whether view wil be collpased or expanded
      */
-    private fun collapseViewIfExpanded(view: View){
+    private fun collapseViewIfExpanded(view: View) {
+        println("meco collasp")
         if (isCollapsed(view).not()) {
             val layoutParams = view.layoutParams
             layoutParams.height = 0
@@ -131,7 +137,7 @@ class SearchableMultiSpinnerAdapter (nestedList: List<ItemSpinner>, private val 
      *Check if view is collapsed. Height `0` means collapsed
      * @param view - View to check height
      */
-    private fun isCollapsed(view: View): Boolean{
+    private fun isCollapsed(view: View): Boolean {
         return view.layoutParams.height == 0
     }
 

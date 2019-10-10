@@ -162,8 +162,7 @@ internal class ListParserUtils {
                 Class.forName(sourceObject.javaClass.name).getConstructor().newInstance()
             }.getOrNull()
                 ?: throw NoSuchMethodException(
-                    "${sourceObject::class.java} has no zero argument constructor. If you're using Kotlin Data Classes, " +
-                            "check here https://kotlinlang.org/docs/reference/data-classes.html#data-classes"
+                    "${sourceObject::class.java} has no zero argument constructor; please, generate zero argument constructor for this class"
                 )
             val pairedFieldSet = getPairedFields(sourceObject.javaClass, targetObject.javaClass)
 

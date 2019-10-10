@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="@dimen/dimension_16dp">
+    android:paddingLeft="@dimen/dimension_16dp"
+    android:paddingRight="@dimen/dimension_16dp">
 
     <com.mecofarid.searchablemultispinner.view.SearchableMultiSpinner
         android:id="@+id/multi_spinner"
