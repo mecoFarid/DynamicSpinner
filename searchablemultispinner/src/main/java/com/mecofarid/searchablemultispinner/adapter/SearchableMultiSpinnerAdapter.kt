@@ -1,10 +1,11 @@
 package com.mecofarid.searchablemultispinner.adapter
 
+import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.util.getOrElse
 import androidx.recyclerview.widget.RecyclerView
-import com.mecofarid.searchablemultispinner.R
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
 import com.mecofarid.searchablemultispinner.util.ListParserUtils
 import com.mecofarid.searchablemultispinner.view.SearchableView
@@ -20,9 +21,10 @@ class SearchableMultiSpinnerAdapter (
         private val layoutResId: Int
     ): RecyclerView.Adapter<SearchableMultiSpinnerAdapter.ViewHolder>() {
 
-    var mParentId = -1L
-
     val mHierarchicList = ListParserUtils.parseToHierarchicFlatList(nestedList, -1, 0)
+
+    // Map to pair Selected item's ID with position
+    val mSelectedItemIdPositionMap = SparseArray<Long>()
 
     // RecyclerView that observes this adapter
     var mRecyclerView: RecyclerView? = null
@@ -46,11 +48,14 @@ class SearchableMultiSpinnerAdapter (
         return mHierarchicList.size
     }
 
+
     override fun onBindViewHolder(holder: ViewHolder, i: Int) {
-        getSubCategoryOf(holder.adapterPosition, mParentId)?.let {
+        val position = holder.adapterPosition
+        getSubCategoryAtWithParentId(position, mSelectedItemIdPositionMap.getOrElse(position-1){-1})?.let {
             holder.bind(it.filterNotNull())
         }
     }
+
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal val searchableView = itemView.findViewWithTag<SearchableView>(SearchableView.TAG)
@@ -59,22 +64,28 @@ class SearchableMultiSpinnerAdapter (
             // Detect automatic SearchableView item selection
             searchableView.setOnSpinnerItemSelectedListener(object : SpinnerItemSelectedListener {
                 override fun onItemSelected(itemSpinner: ItemSpinner) {
-                    mParentId = itemSpinner.itemSpinnerId
-
                     mOuterSpinnerItemClickedListener.onItemSelected(itemSpinner)
+                }
+            })
+
+            // Detect Physical SearchableView item selection
+            searchableView.setOnSpinnerClickedListener(object : SpinnerItemClickedListener{
+                override fun onItemClicked(itemSpinner: ItemSpinner) {
+                    mSelectedItemIdPositionMap.put(adapterPosition, itemSpinner.itemSpinnerId)
                     notifyItemsBelow(adapterPosition)
                 }
-
             })
         }
 
         fun bind(itemList: List<ItemSpinner>) {
             if (itemList.isNotEmpty()) {
+
+                mSelectedItemIdPositionMap.put(adapterPosition, itemList[0].itemSpinnerId)
+
                 expandViewIfCollapsed(itemView)
                 searchableView.updateItemList(itemList)
                 mRecyclerView?.post {
                     searchableView.setSelectedItem(itemList[0])
-
                 }
             } else {
                 collapseViewIfExpanded(itemView)
@@ -82,13 +93,14 @@ class SearchableMultiSpinnerAdapter (
         }
     }
 
+
     /**
      * Returns subcategory for selected [ItemSpinner] of [SearchableView]
      *
      * @param position - Position of RecyclerView item
      * @param parentId - Id of parent category
      */
-    private fun getSubCategoryOf(position: Int, parentId: Long): List<ItemSpinner?>? {
+    private fun getSubCategoryAtWithParentId(position: Int, parentId: Long): List<ItemSpinner?>? {
         return mHierarchicList[position].filter {
             it.itemSpinnerParentId == parentId
         }
@@ -124,7 +136,6 @@ class SearchableMultiSpinnerAdapter (
      * @param collpase - Decide whether view wil be collpased or expanded
      */
     private fun collapseViewIfExpanded(view: View) {
-        println("meco collasp")
         if (isCollapsed(view).not()) {
             val layoutParams = view.layoutParams
             layoutParams.height = 0
@@ -144,5 +155,10 @@ class SearchableMultiSpinnerAdapter (
     // Listener to notify classes (that implement this interface) when item selected
     interface SpinnerItemSelectedListener {
         fun onItemSelected(itemSpinner: ItemSpinner)
+    }
+
+    // Listener to notify classes (that implement this interface) when item physically clicked
+    internal interface SpinnerItemClickedListener {
+        fun onItemClicked(itemSpinner: ItemSpinner)
     }
 }

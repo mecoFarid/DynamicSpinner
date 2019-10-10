@@ -1,19 +1,12 @@
-
 package com.mecofarid.searchablespinnersample.model;
-
 
 import androidx.annotation.NonNull;
 
-import com.mecofarid.searchablemultispinner.annotation.SubCategory;
 import com.mecofarid.searchablemultispinner.model.ItemSpinner;
 
-import java.util.List;
-
-public class RoomList  extends ItemSpinner {
-
+public class ByteList extends ItemSpinner {
     public String name;
-    @SubCategory
-    public List<ItemList> itemList = null;
+    public Integer code;
     @NonNull
     @Override
     public String toString() {

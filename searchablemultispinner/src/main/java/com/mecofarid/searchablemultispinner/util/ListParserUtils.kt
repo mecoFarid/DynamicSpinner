@@ -98,7 +98,7 @@ internal class ListParserUtils {
          * to parents in nested list
          * @param level - Category level of current item
          */
-        private fun getFlatList(
+        fun getFlatList(
             nestedList: List<ItemSpinner?>,
             parentId: Long,
             level: Int

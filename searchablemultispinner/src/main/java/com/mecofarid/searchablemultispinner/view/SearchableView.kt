@@ -8,6 +8,7 @@ import android.widget.*
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import com.mecofarid.searchablemultispinner.R
+import com.mecofarid.searchablemultispinner.adapter.SearchableMultiSpinnerAdapter.SpinnerItemClickedListener
 import com.mecofarid.searchablemultispinner.adapter.SearchableMultiSpinnerAdapter.SpinnerItemSelectedListener
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
 
@@ -37,7 +38,8 @@ class SearchableView @JvmOverloads constructor(
 
     private val mSpinnerItemList: ArrayList<ItemSpinner> = ArrayList()
     private var mSpinnerItemSelectedListener: SpinnerItemSelectedListener? = null
-    private lateinit var mSelectedItem: ItemSpinner
+    private var mSpinnerItemClickedListener: SpinnerItemClickedListener? = null
+    private var mSelectedItem: ItemSpinner? = null
     private var mAutoCompleteTextView: AutoCompleteTextView
     private var mOpenSearchViewIcon: ImageView
     private var mCloseSearchViewIcon: ImageView
@@ -89,7 +91,7 @@ class SearchableView @JvmOverloads constructor(
 
 
         //Initializes adapter with empty item list
-        initializeAndSetAdpater()
+        initializeAndSetAdapter()
 
         // Handles all touch events on the view
         handleTouchEvents()
@@ -100,7 +102,7 @@ class SearchableView @JvmOverloads constructor(
         addView(view)
     }
 
-    private fun initializeAndSetAdpater(){
+    private fun initializeAndSetAdapter(){
         // Items will added later
         val arrayAdapter = ArrayAdapter(context, R.layout.support_simple_spinner_dropdown_item, mSpinnerItemList)
         mAutoCompleteTextView.setAdapter(arrayAdapter)
@@ -110,7 +112,7 @@ class SearchableView @JvmOverloads constructor(
         mOpenSearchViewIcon.setOnClickListener { openSearchIfClosed() }
         mCloseSearchViewIcon.setOnClickListener { closeSearchIfOpen() }
         mAutoCompleteTextView.setOnItemClickListener { p0, p1, p2, p3 ->
-            setSelectedItem(mAutoCompleteTextView.adapter.getItem(p2) as ItemSpinner)
+            mSpinnerItemClickedListener?.onItemClicked(mAutoCompleteTextView.adapter.getItem(p2) as ItemSpinner)
         }
         mAutoCompleteTextView.setOnClickListener {
             showDropDownIfSearchNotOpen()
@@ -268,10 +270,17 @@ class SearchableView @JvmOverloads constructor(
     }
 
     /**
+     * @param itemClickListener The listener to be passed to SearchableView to detect automatic selections
+     */
+    internal fun setOnSpinnerClickedListener(spinnerItemClickedListener: SpinnerItemClickedListener) {
+        mSpinnerItemClickedListener = spinnerItemClickedListener
+    }
+
+    /**
      * Sets text to AutoCompleteTextView
      *
      * @param text -Text to be set
-     * @param showDropdown - Wheather to show drop down selection or not
+     * @param showDropdown - Whether to show drop down selection or not
      */
     private fun setAutoCompleteText(text: String) {
         mAutoCompleteTextView.setText(text, false)
@@ -285,10 +294,15 @@ class SearchableView @JvmOverloads constructor(
         setAutoCompleteText(selectedItem.toString())
 
         mSelectedItem = selectedItem
-        mSpinnerItemSelectedListener?.onItemSelected(mSelectedItem)
+        mSpinnerItemSelectedListener?.onItemSelected(mSelectedItem ?: return)
 
         // This is necessary to make AutoCompleteTextView uneditable when item selected from AutoCompleteTextView's options list
         closeSearchIfOpen()
+    }
+
+    // Returns selected item
+    internal fun getSelectedItem(): ItemSpinner? {
+        return mSelectedItem
     }
 
     // Returns weather SearchableView is open or not. Namely, search by typing is possible or not
