@@ -12,13 +12,13 @@ import com.mecofarid.searchablemultispinner.view.SearchableView
 
 /**
  * @param nestedList - This is nested list
- * @param mOuterSpinnerItemClickedListener - The listener from outer class through which that class will be notified when
+ * @param mOuterSpinnerItemSelectedListener - The listener from outer class through which that class will be notified when
  * item selected
  */
 class SearchableMultiSpinnerAdapter (
-        nestedList: List<ItemSpinner>,
-        private val mOuterSpinnerItemClickedListener: SpinnerItemSelectedListener,
-        private val layoutResId: Int
+    nestedList: List<ItemSpinner>,
+    private val mOuterSpinnerItemSelectedListener: SpinnerItemSelectedListener,
+    private val layoutResId: Int
     ): RecyclerView.Adapter<SearchableMultiSpinnerAdapter.ViewHolder>() {
 
     val mHierarchicList = ListParserUtils.parseToHierarchicFlatList(nestedList, -1, 0)
@@ -26,17 +26,9 @@ class SearchableMultiSpinnerAdapter (
     // Map to pair Selected item's ID with position
     val mSelectedItemIdPositionMap = SparseArray<Long>()
 
-    // RecyclerView that observes this adapter
-    var mRecyclerView: RecyclerView? = null
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        mRecyclerView = recyclerView
-    }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        mRecyclerView = null
+    // As soon as initialized send latest item in hierarchy
+    init {
+        mOuterSpinnerItemSelectedListener.onItemSelected(getLatestItemInHierarchy(0, ItemSpinner()))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -47,7 +39,6 @@ class SearchableMultiSpinnerAdapter (
     override fun getItemCount(): Int {
         return mHierarchicList.size
     }
-
 
     override fun onBindViewHolder(holder: ViewHolder, i: Int) {
         val position = holder.adapterPosition
@@ -64,7 +55,7 @@ class SearchableMultiSpinnerAdapter (
             // Detect automatic SearchableView item selection
             searchableView.setOnSpinnerItemSelectedListener(object : SpinnerItemSelectedListener {
                 override fun onItemSelected(itemSpinner: ItemSpinner) {
-                    mOuterSpinnerItemClickedListener.onItemSelected(itemSpinner)
+//                    mOuterSpinnerItemSelectedListener.onItemSelected(itemSpinner)
                 }
             })
 
@@ -73,6 +64,7 @@ class SearchableMultiSpinnerAdapter (
                 override fun onItemClicked(itemSpinner: ItemSpinner) {
                     mSelectedItemIdPositionMap.put(adapterPosition, itemSpinner.itemSpinnerId)
                     notifyItemsBelow(adapterPosition)
+                    mOuterSpinnerItemSelectedListener.onItemSelected(getLatestItemInHierarchy(adapterPosition+1, itemSpinner))
                 }
             })
         }
@@ -84,15 +76,12 @@ class SearchableMultiSpinnerAdapter (
 
                 expandViewIfCollapsed(itemView)
                 searchableView.updateItemList(itemList)
-                mRecyclerView?.post {
-                    searchableView.setSelectedItem(itemList[0])
-                }
+                searchableView.setSelectedItem(itemList[0])
             } else {
                 collapseViewIfExpanded(itemView)
             }
         }
     }
-
 
     /**
      * Returns subcategory for selected [ItemSpinner] of [SearchableView]
@@ -104,6 +93,21 @@ class SearchableMultiSpinnerAdapter (
         return mHierarchicList[position].filter {
             it.itemSpinnerParentId == parentId
         }
+    }
+
+    /**
+     * Return latest item in hierarchy for given parent
+     * @param level - Hierarchy level
+     * @param parentItem - Parent item whose hierarchy is being searched
+     */
+    private fun getLatestItemInHierarchy(level: Int, parentItem: ItemSpinner): ItemSpinner{
+        println("mecod level ${level} ${parentItem.itemSpinnerId}")
+        val firstChild =
+            kotlin.runCatching {  mHierarchicList[level].firstOrNull { it.itemSpinnerParentId == parentItem.itemSpinnerId }}.getOrNull()
+        firstChild?.let {
+            return getLatestItemInHierarchy(level + 1, firstChild)
+        }
+        return parentItem
     }
 
     /**
