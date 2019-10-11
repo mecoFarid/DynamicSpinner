@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity(), SearchableMultiSpinnerAdapter.SpinnerI
     }
 
     override fun onItemSelected(itemSpinner: ItemSpinner) {
-        Log.d("Selected item id: ", itemSpinner.itemSpinnerId.toString())
+       println("meco selected id "+itemSpinner.itemSpinnerId.toString())
     }
 
 }
