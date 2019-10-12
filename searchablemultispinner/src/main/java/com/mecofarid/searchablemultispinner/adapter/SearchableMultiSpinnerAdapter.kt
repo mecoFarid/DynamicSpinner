@@ -1,16 +1,17 @@
 package com.mecofarid.searchablemultispinner.adapter
 
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.mecofarid.searchablemultispinner.R
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
 import com.mecofarid.searchablemultispinner.model.ItemMultiSpinner
 import com.mecofarid.searchablemultispinner.util.ListParserUtils
 import com.mecofarid.searchablemultispinner.view.SearchableView
 
-const val ABSENT_PARENT_ID = -5L
 /**
  * @param nestedList - This is nested list
  * @param mOuterSpinnerItemSelectedListener - The listener from outer class through which that class will be notified when
@@ -21,24 +22,25 @@ class SearchableMultiSpinnerAdapter (
     private val mOuterSpinnerItemSelectedListener: SpinnerItemSelectedListener,
     private val layoutResId: Int
     ): RecyclerView.Adapter<SearchableMultiSpinnerAdapter.ViewHolder>() {
-
     val mHierarchicList = ListParserUtils.parseToHierarchicFlatList(nestedList, -1, 0)
 
-    lateinit var mRecyclerView: RecyclerView
+    val mMultiSpinnerItemList = List(mHierarchicList.size){ItemMultiSpinner()}
 
-    // Map to pair Selected item's ID with position
-//    val mSelectedItemIdPositionMap = SparseArray<Long>()
+    // As soon as initialized send latest item in hierarchy
+    init {
+        mOuterSpinnerItemSelectedListener.onItemSelected(getLatestItemInHierarchy(0, ItemSpinner()))
+    }
+
+    var mRecyclerView: RecyclerView?= null
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         mRecyclerView = recyclerView
     }
 
-    val mTestModelList = List(mHierarchicList.size){ItemMultiSpinner()}
-
-    // As soon as initialized send latest item in hierarchy
-    init {
-        mOuterSpinnerItemSelectedListener.onItemSelected(getLatestItemInHierarchy(0, ItemSpinner()))
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        mRecyclerView = null
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -53,7 +55,7 @@ class SearchableMultiSpinnerAdapter (
     override fun onBindViewHolder(holder: ViewHolder, i: Int) {
         val position = holder.adapterPosition
         getSubCategoryAtWithParentId(position,
-            mTestModelList.getOrElse(position - 1) { ItemMultiSpinner() }.selectedItemSpinner?.itemSpinnerId
+            mMultiSpinnerItemList.getOrElse(position - 1) { ItemMultiSpinner() }.selectedItemSpinner?.itemSpinnerId
                 ?: -1
         )
             ?.let {
@@ -63,16 +65,15 @@ class SearchableMultiSpinnerAdapter (
 
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal val searchableView = itemView.findViewWithTag<SearchableView>(SearchableView.TAG)
-
+        private val searchableView = itemView.findViewWithTag<SearchableView>(SearchableView.TAG)
         init {
             // Detect Physical SearchableView item selection
             searchableView.setOnSpinnerClickedListener(object : SpinnerItemClickedListener{
                 override fun onItemClicked(itemSpinner: ItemSpinner) {
                     val position = adapterPosition
 
-                    mTestModelList[position].selectedItemSpinner = mHierarchicList[position].first { itemSpinner.itemSpinnerId == it.itemSpinnerId }
-                    resetParentIdsBelow(position)
+                    mMultiSpinnerItemList[position].selectedItemSpinner = mHierarchicList[position].first { itemSpinner.itemSpinnerId == it.itemSpinnerId }
+                    resetSelectedItemsBelow(position)
                     notifyItemsBelow(position)
                     mOuterSpinnerItemSelectedListener.onItemSelected(getLatestItemInHierarchy(position+1, itemSpinner))
                 }
@@ -83,15 +84,15 @@ class SearchableMultiSpinnerAdapter (
             if (itemList.isNotEmpty()) {
                 val position = adapterPosition
 
-                expandViewIfCollapsed(itemView)
-                searchableView.updateItemList(itemList)
+                expandViewIfCollapsed(searchableView)
 
-                val selectedItemSpinner = mTestModelList[position].selectedItemSpinner ?: itemList[0]
+                searchableView.updateItemList(itemList)
+                val selectedItemSpinner = mMultiSpinnerItemList[position].selectedItemSpinner ?: itemList[0]
                 searchableView.setSelectedItem(selectedItemSpinner)
-                mTestModelList[position].selectedItemSpinner = selectedItemSpinner
+                mMultiSpinnerItemList[position].selectedItemSpinner = selectedItemSpinner
 
             } else {
-                collapseViewIfExpanded(itemView)
+                collapseViewIfExpanded(searchableView)
             }
         }
     }
@@ -128,7 +129,16 @@ class SearchableMultiSpinnerAdapter (
      */
     private fun notifyItemsBelow(currentPosition: Int) {
         for (position in currentPosition + 1 until itemCount) {
-            Handler().postDelayed({ notifyItemChanged(position) }, position*100L)
+            notifyItemChanged(position)
+        }
+        mRecyclerView?.let{
+            it.post {
+                // Re-layout to expand RecyclerView to wrap its current content, otherwise layout params won't change and will keep the same
+                // height from previous selection. For example, if there were 3 categories (3 items in RecyclerView) in previous hierarchy
+                // and 10 categories (10 items in RecyclerView) in current hierarchy then height of RecyclerView will keep the same height
+                // when there were 3 categories
+                it.requestLayout()
+            }
         }
     }
 
@@ -136,10 +146,9 @@ class SearchableMultiSpinnerAdapter (
      * Will reset all parent ids below [currentPosition]
      * @param currentPosition - Current position under which all parent IDs will be reset to default
      */
-    private fun resetParentIdsBelow(currentPosition: Int){
+    private fun resetSelectedItemsBelow(currentPosition: Int){
         for (position in currentPosition + 1 until itemCount) {
-            println("meco prev do do " +position)
-            mTestModelList[position].selectedItemSpinner = null
+            mMultiSpinnerItemList[position].selectedItemSpinner = null
         }
     }
 
@@ -148,11 +157,12 @@ class SearchableMultiSpinnerAdapter (
      *
      * @param view - View to be expanded
      */
-    private fun expandViewIfCollapsed(view: View) {
-        if (isCollapsed(view)) {
-            val layoutParams = view.layoutParams
-            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-            view.layoutParams = layoutParams
+    private fun expandViewIfCollapsed(searchableView: SearchableView) {
+        with(searchableView.findViewById<RelativeLayout>(R.id.searchable_view_content)) {
+            if (searchableView.useCompatPadding.not() && this.isVisible.not()){
+                searchableView.useCompatPadding = true
+                this.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -162,11 +172,12 @@ class SearchableMultiSpinnerAdapter (
      * @param view - View to be collapsed/expanded
      * @param collpase - Decide whether view wil be collpased or expanded
      */
-    private fun collapseViewIfExpanded(view: View) {
-        if (isCollapsed(view).not()) {
-            val layoutParams = view.layoutParams
-            layoutParams.height = 0
-            view.layoutParams = layoutParams
+    private fun collapseViewIfExpanded(searchableView: SearchableView) {
+        with(searchableView.findViewById<RelativeLayout>(R.id.searchable_view_content)) {
+            if (searchableView.useCompatPadding && this.isVisible){
+                searchableView.useCompatPadding = false
+                this.visibility = View.GONE
+            }
         }
     }
 
