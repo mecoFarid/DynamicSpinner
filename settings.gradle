@@ -1,1 +1,1 @@
-include ':app', ':searchablemultispinner'
+include ':app', ':dynamicspinner'

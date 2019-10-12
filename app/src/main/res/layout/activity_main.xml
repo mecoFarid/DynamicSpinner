@@ -6,8 +6,8 @@
     android:paddingLeft="@dimen/dimension_16dp"
     android:paddingRight="@dimen/dimension_16dp">
 
-    <com.mecofarid.searchablemultispinner.view.SearchableMultiSpinner
-        android:id="@+id/multi_spinner"
+    <com.mecofarid.dynamicspinner.view.DynamicSpinner
+        android:id="@+id/dynamic_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"

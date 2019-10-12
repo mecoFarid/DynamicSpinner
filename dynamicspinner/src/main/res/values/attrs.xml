@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SearchableView">
+        <attr name="ds_icon_closeSearchView" format="reference"/>
+        <attr name="ds_icon_openSearchView" format="reference"/>
+        <attr name="ds_iconColor_closeSearcView" format="color"/>
+        <attr name="ds_iconColor_openSearchView" format="color"/>
+        <attr name="ds_isSearchable" format="boolean"/>
+        <attr name="ds_textSelectionMode"/>
+    </declare-styleable>
+
+    <attr name="ds_textSelectionMode" format="enum">
+        <enum name="end" value="0"/>
+        <enum name="start" value="1"/>
+        <enum name="all" value="2"/>
+    </attr>
+</resources>
