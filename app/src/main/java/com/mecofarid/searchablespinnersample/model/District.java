@@ -8,12 +8,12 @@ import com.mecofarid.searchablemultispinner.model.ItemSpinner;
 
 import java.util.List;
 
-public class ApartmentList extends ItemSpinner {
+public class District extends ItemSpinner {
 
     public String name;
     public Integer code;
     @SubCategory
-    public List<RoomList> roomList = null;
+    public List<Avenue> avenueList = null;
 
     @NonNull
     @Override

@@ -1,13 +1,15 @@
 package com.mecofarid.searchablespinnersample
 
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
 import com.google.gson.Gson
 import com.mecofarid.searchablemultispinner.adapter.SearchableMultiSpinnerAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import com.mecofarid.searchablemultispinner.model.ItemSpinner
-import com.mecofarid.searchablespinnersample.model.Response
+import com.mecofarid.searchablespinnersample.model.*
+import com.mecofarid.searchablespinnersample.model.Byte
 
 
 class MainActivity : AppCompatActivity(), SearchableMultiSpinnerAdapter.SpinnerItemSelectedListener{
@@ -30,7 +32,30 @@ class MainActivity : AppCompatActivity(), SearchableMultiSpinnerAdapter.SpinnerI
     }
 
     override fun onItemSelected(itemSpinner: ItemSpinner) {
-       println("meco selected id "+itemSpinner.itemSpinnerId.toString())
+        when(itemSpinner.itemSpinnerLevel){
+            0 -> showToast((itemSpinner as Planet).name)
+            1 -> showToast((itemSpinner as Country).name)
+            2 -> showToast((itemSpinner as City).name)
+            3 -> showToast((itemSpinner as Borough).name)
+            4 -> showToast((itemSpinner as District).name)
+            5 -> showToast((itemSpinner as Avenue).name)
+            6 -> showToast((itemSpinner as Street).name)
+            7 -> showToast((itemSpinner as Alley).name)
+            8 -> showToast((itemSpinner as Building).name)
+            9 -> showToast((itemSpinner as Entrance).name)
+            10 -> showToast((itemSpinner as Storey).name)
+            11 -> showToast((itemSpinner as Apartment).name)
+            12 -> showToast((itemSpinner as Room).name)
+            13 -> showToast((itemSpinner as Item).name)
+            14 -> showToast((itemSpinner as Folder).name)
+            15 -> showToast((itemSpinner as File).name)
+            16 -> showToast((itemSpinner as Content).name)
+            17 -> showToast((itemSpinner as Byte).name)
+        }
+    }
+    
+    private fun showToast(message: String){
+        Toast.makeText(this, "Selected item: ${message}", Toast.LENGTH_SHORT).show()
     }
 
 }

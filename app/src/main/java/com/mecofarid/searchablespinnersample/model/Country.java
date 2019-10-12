@@ -8,12 +8,12 @@ import com.mecofarid.searchablemultispinner.model.ItemSpinner;
 
 import java.util.List;
 
-public class CountryList  extends ItemSpinner {
+public class Country extends ItemSpinner {
 
     public String name;
     public Integer code;
     @SubCategory
-    public List<CityList> cityList = null;
+    public List<City> cityList = null;
 
     @NonNull
     @Override

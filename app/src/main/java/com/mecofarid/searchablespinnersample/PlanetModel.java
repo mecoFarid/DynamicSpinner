@@ -7,137 +7,137 @@ import java.util.List;
 
 public class PlanetModel {
 
-//    public List<PlanetList> planetList = null;
+//    public List<Planet> planetList = null;
 //
 //
-//    public class AlleyList extends ItemSpinner {
+//    public class Alley extends ItemSpinner {
 //
-//        public AlleyList() {
+//        public Alley() {
 //        }
 //
 //        public String name;
 //        public Integer code;
-//        public List<BuildingList> buildingList = null;
+//        public List<Building> buildingList = null;
 //
 //    }
 //
-//    public class ApartmentList extends ItemSpinner  {
-//        public ApartmentList() {
+//    public class Apartment extends ItemSpinner  {
+//        public Apartment() {
 //        }
 //
 //        public String name;
 //        public Integer code;
-//        public List<RoomList> roomList = null;
+//        public List<Room> roomList = null;
 //
 //    }
 //
-//    public class AvenueList  extends ItemSpinner {
-//        public AvenueList() {
+//    public class Avenue  extends ItemSpinner {
+//        public Avenue() {
 //        }
 //
 //        public String name;
 //        public Integer code;
-//        public List<StreetList> streetList = null;
+//        public List<Street> streetList = null;
 //
 //    }
 //
-//    public class BoroughList extends ItemSpinner  {
-//        public BoroughList() {
+//    public class Borough extends ItemSpinner  {
+//        public Borough() {
 //        }
 //
 //        public String name;
 //        public Integer code;
-//        public List<DistrictList> districtList = null;
+//        public List<District> districtList = null;
 //
 //    }
 //
-//    public class BuildingList  extends ItemSpinner {
+//    public class Building  extends ItemSpinner {
 //
 //        public String name;
 //
-//        public BuildingList() {
+//        public Building() {
 //        }
 //
 //        public Integer code;
-//        public List<EntanceList> entanceList = null;
+//        public List<Entrance> entanceList = null;
 //
 //    }
 //
-//    public class CityList extends ItemSpinner  {
-//        public CityList() {
+//    public class City extends ItemSpinner  {
+//        public City() {
 //        }
 //
 //        public String name;
 //        public Integer code;
-//        public List<BoroughList> boroughList = null;
+//        public List<Borough> boroughList = null;
 //
 //    }
 //
-//    public class CountryList extends ItemSpinner  {
-//        public CountryList() {
+//    public class Country extends ItemSpinner  {
+//        public Country() {
 //        }
 //
 //        public String countryName;
 //        public Integer code;
-//        public List<CityList> cityList = null;
+//        public List<City> cityList = null;
 //
 //    }
 //
-//    public class DistrictList  extends ItemSpinner {
-//        public DistrictList() {
+//    public class District  extends ItemSpinner {
+//        public District() {
 //        }
 //
 //        public String name;
 //        public Integer code;
-//        public List<AvenueList> avenueList = null;
+//        public List<Avenue> avenueList = null;
 //
 //    }
 //
-//    public class EntanceList  extends ItemSpinner {
-//        public EntanceList() {
+//    public class Entrance  extends ItemSpinner {
+//        public Entrance() {
 //        }
 //
 //        public String name;
 //        public Integer code;
-//        public List<StoreyList> storeyList = null;
+//        public List<Storey> storeyList = null;
 //
 //    }
 //
-//    public class PlanetList extends ItemSpinner  {
-//        public PlanetList() {
+//    public class Planet extends ItemSpinner  {
+//        public Planet() {
 //        }
 //
 //        public String planetName;
-//        public List<CountryList> countryList = null;
+//        public List<Country> countryList = null;
 //
 //    }
 //
 //
-//    public class RoomList  extends ItemSpinner {
-//        public RoomList() {
+//    public class Room  extends ItemSpinner {
+//        public Room() {
 //        }
 //
 //        public String name;
 //
 //    }
 //
-//    public class StoreyList extends ItemSpinner  {
-//        public StoreyList() {
-//        }
-//
-//        public String name;
-//        public Integer code;
-//        public List<ApartmentList> apartmentList = null;
-//
-//    }
-//
-//    public class StreetList extends ItemSpinner  {
-//        public StreetList() {
+//    public class Storey extends ItemSpinner  {
+//        public Storey() {
 //        }
 //
 //        public String name;
 //        public Integer code;
-//        public List<AlleyList> alleyList = null;
+//        public List<Apartment> apartmentList = null;
+//
+//    }
+//
+//    public class Street extends ItemSpinner  {
+//        public Street() {
+//        }
+//
+//        public String name;
+//        public Integer code;
+//        public List<Alley> alleyList = null;
 //
 //    }
 

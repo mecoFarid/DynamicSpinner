@@ -7,11 +7,11 @@ import com.mecofarid.searchablemultispinner.model.ItemSpinner;
 
 import java.util.List;
 
-public class FileList extends ItemSpinner {
+public class File extends ItemSpinner {
     public String name;
     public Integer code;
     @SubCategory
-    public List<ContentList> contentList = null;
+    public List<Content> contentList = null;
     @NonNull
     @Override
     public String toString() {
