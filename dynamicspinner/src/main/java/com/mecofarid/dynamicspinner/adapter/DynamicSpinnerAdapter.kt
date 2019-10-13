@@ -36,11 +36,25 @@ class DynamicSpinnerAdapter (
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         mRecyclerView = recyclerView
+
+        /**
+         * After introducing [NoFilterAutoCompleteTextView] selection list started to not appear in correct place. For example,
+         * after a few up and down scrolls 15th RecyclerView item ([NoFilterAutoCompleteTextView]) was displaying items of
+         * 2nd item ([NoFilterAutoCompleteTextView]) in RecyclerView
+         */
+        recyclerView.recycledViewPool.setMaxRecycledViews(0,0)
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
         mRecyclerView = null
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        /**
+         * Check explanation in [onAttachedToRecyclerView]
+         */
+        return 0
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -83,6 +97,7 @@ class DynamicSpinnerAdapter (
         fun bind(itemList: List<ItemSpinner>) {
             if (itemList.isNotEmpty()) {
                 val position = adapterPosition
+                println("meoc multi ${position} ${itemList[0]}")
 
                 expandViewIfCollapsed(searchableView)
 
@@ -179,15 +194,6 @@ class DynamicSpinnerAdapter (
                 this.visibility = View.GONE
             }
         }
-    }
-
-    /**
-     *
-     *Check if view is collapsed. Height `0` means collapsed
-     * @param view - View to check height
-     */
-    private fun isCollapsed(view: View): Boolean {
-        return view.layoutParams.height == 0
     }
 
     // Listener to notify classes (that implement this interface) when item selected

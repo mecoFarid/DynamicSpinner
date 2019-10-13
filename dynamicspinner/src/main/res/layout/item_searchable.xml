@@ -2,7 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/searchable_view_content"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
     <ImageView
         android:id="@+id/search"
@@ -14,7 +16,7 @@
         android:paddingTop="@dimen/dimension_8dp"
         android:paddingBottom="@dimen/dimension_8dp"/>
 
-    <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+    <com.mecofarid.dynamicspinner.view.NoFilterAutoCompleteTextView
         android:id="@+id/autocomplete_textview"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"

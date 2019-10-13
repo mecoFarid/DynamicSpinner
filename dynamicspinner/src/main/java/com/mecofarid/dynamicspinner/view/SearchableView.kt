@@ -9,7 +9,6 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import com.mecofarid.dynamicspinner.R
 import com.mecofarid.dynamicspinner.adapter.DynamicSpinnerAdapter.SpinnerItemClickedListener
-import com.mecofarid.dynamicspinner.adapter.DynamicSpinnerAdapter.SpinnerItemSelectedListener
 import com.mecofarid.dynamicspinner.model.ItemSpinner
 
 class SearchableView @JvmOverloads constructor(
@@ -37,7 +36,6 @@ class SearchableView @JvmOverloads constructor(
     }
 
     private val mSpinnerItemList: ArrayList<ItemSpinner> = ArrayList()
-    private var mSpinnerItemSelectedListener: SpinnerItemSelectedListener? = null
     private var mSpinnerItemClickedListener: SpinnerItemClickedListener? = null
     private var mSelectedItem: ItemSpinner? = null
     private var mAutoCompleteTextView: AutoCompleteTextView
@@ -61,6 +59,7 @@ class SearchableView @JvmOverloads constructor(
         mAutoCompleteTextView = view.findViewById(R.id.autocomplete_textview)
         mOpenSearchViewIcon = view.findViewById(R.id.search)
         mCloseSearchViewIcon = view.findViewById(R.id.close)
+//        val rel = view.findViewById(R.id.searchable_view_content) as RelativeLayout
 
         //Set values from attributes or default
         with(context.obtainStyledAttributes(attrs, R.styleable.SearchableView, defStyleAttr, 0)){
@@ -89,6 +88,13 @@ class SearchableView @JvmOverloads constructor(
             recycle()
         }
 
+//        rel.requestFocus()
+//
+//        rel.setOnFocusChangeListener { view, b ->
+//            println("meoc multi self down $b}")
+//        }
+
+        mAutoCompleteTextView.showSoftInputOnFocus = false
 
         //Initializes adapter with empty item list
         initializeAndSetAdapter()
@@ -113,9 +119,20 @@ class SearchableView @JvmOverloads constructor(
         mCloseSearchViewIcon.setOnClickListener { closeSearchIfOpen() }
         mAutoCompleteTextView.setOnItemClickListener { p0, p1, p2, p3 ->
             mSpinnerItemClickedListener?.onItemClicked(mAutoCompleteTextView.adapter.getItem(p2) as ItemSpinner)
+            setSelectedItem(mAutoCompleteTextView.adapter.getItem(p2) as ItemSpinner)
         }
         mAutoCompleteTextView.setOnClickListener {
-            showDropDownIfSearchNotOpen()
+            if (isSearchOpen()){
+                requestFocusOnAutocompleteTextView(true, true)
+                showKeyboard(true)
+            }else {
+                // Requesting focus so that any other view with focus can loose their focus. If focus not requested on current item
+                // and there is another view in focused state (focused/editable AutoCompleteTextView), then RecyclerView will crash
+                // because of focus
+                requestFocusOnAutocompleteTextView(true, false)
+
+                showDropDown()
+            }
         }
     }
 
@@ -167,49 +184,50 @@ class SearchableView @JvmOverloads constructor(
         mCloseSearchViewIcon.setImageResource(resId)
     }
 
-    // Will show all selection list of AutoCompleteTextView if search by is closed, namely, typing is not possible
-    private fun showDropDownIfSearchNotOpen() {
-        if (isSearchOpen().not()) mAutoCompleteTextView.showDropDown()
+    // Will show all selection list of AutoCompleteTextView
+    private fun showDropDown() {
+        mAutoCompleteTextView.showDropDown()
     }
 
     // Opens SearchableView and makes search by typing possible
     private fun openSearchIfClosed(){
         if (isSearchOpen().not()){
-            requestFocusOnAutocompleteTextView(true)
-            showKeyboard(true)
+            requestFocusOnAutocompleteTextView(true, true)
+            setTextSelectionMode(mTextSelectionMode)
 
             showStartSearchIcon(false)
             showCloseSearchIcon(true)
         }
+        showKeyboard(true)
         mIsSearchOpen = true
     }
 
     // Closes SearchableView and makes search by typing impossible
     private fun closeSearchIfOpen(){
         if (isSearchOpen()){
-            requestFocusOnAutocompleteTextView(false)
-            showKeyboard(false)
+            requestFocusOnAutocompleteTextView(false, false)
 
             showStartSearchIcon(true)
             showCloseSearchIcon(false)
         }
+        showKeyboard(false)
         mIsSearchOpen = false
     }
 
     /**
      * Requests focus on AutoCompleteTextView so that search by typing is possible
      * @param requestFocus - Request focus on View if [true]
+     * @param showCursor - show cursor if true
      */
-    private fun requestFocusOnAutocompleteTextView(requestFocus: Boolean) {
+    private fun requestFocusOnAutocompleteTextView(requestFocus: Boolean, showCursor: Boolean) {
 
         mAutoCompleteTextView.apply {
-            isCursorVisible = requestFocus
+            isCursorVisible = showCursor
             isFocusableInTouchMode = requestFocus
             isFocusable = requestFocus
 
             if (requestFocus){
                 requestFocus()
-                setTextSelectionMode(mTextSelectionMode)
             }
         }
     }
@@ -265,13 +283,6 @@ class SearchableView @JvmOverloads constructor(
     /**
      * @param itemClickListener The listener to be passed to SearchableView to detect automatic selections
      */
-    internal fun setOnSpinnerItemSelectedListener(spinnerItemSelectedListener: SpinnerItemSelectedListener) {
-        mSpinnerItemSelectedListener = spinnerItemSelectedListener
-    }
-
-    /**
-     * @param itemClickListener The listener to be passed to SearchableView to detect automatic selections
-     */
     internal fun setOnSpinnerClickedListener(spinnerItemClickedListener: SpinnerItemClickedListener) {
         mSpinnerItemClickedListener = spinnerItemClickedListener
     }
@@ -294,7 +305,6 @@ class SearchableView @JvmOverloads constructor(
         setAutoCompleteText(selectedItem.toString())
 
         mSelectedItem = selectedItem
-        mSpinnerItemSelectedListener?.onItemSelected(mSelectedItem ?: return)
 
         // This is necessary to make AutoCompleteTextView uneditable when item selected from AutoCompleteTextView's options list
         closeSearchIfOpen()
