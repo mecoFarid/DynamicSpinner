@@ -32,7 +32,7 @@ allprojects {
 ```
 dependencies {
     ...
-    implementation 'com.github.mecoFarid:DynamicSpinner:1.0.0'
+    implementation 'com.github.mecoFarid:DynamicSpinner:1.0.1'
 }
 ```
 **Step 3.** Create `xml` file to hold your single spinner (let's call it `item_spinner.xml`)
