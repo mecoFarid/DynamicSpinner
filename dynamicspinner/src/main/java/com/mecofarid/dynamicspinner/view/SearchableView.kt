@@ -2,6 +2,9 @@ package com.mecofarid.dynamicspinner.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.ActionMode
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -59,7 +62,6 @@ class SearchableView @JvmOverloads constructor(
         mAutoCompleteTextView = view.findViewById(R.id.autocomplete_textview)
         mOpenSearchViewIcon = view.findViewById(R.id.search)
         mCloseSearchViewIcon = view.findViewById(R.id.close)
-//        val rel = view.findViewById(R.id.searchable_view_content) as RelativeLayout
 
         //Set values from attributes or default
         with(context.obtainStyledAttributes(attrs, R.styleable.SearchableView, defStyleAttr, 0)){
@@ -88,13 +90,10 @@ class SearchableView @JvmOverloads constructor(
             recycle()
         }
 
-//        rel.requestFocus()
-//
-//        rel.setOnFocusChangeListener { view, b ->
-//            println("meoc multi self down $b}")
-//        }
-
         mAutoCompleteTextView.showSoftInputOnFocus = false
+
+        // Disables system to pop-up copy-paste window
+        disableCopyPastePopup()
 
         //Initializes adapter with empty item list
         initializeAndSetAdapter()
@@ -106,6 +105,25 @@ class SearchableView @JvmOverloads constructor(
         handleFocusChanges()
 
         addView(view)
+    }
+
+    private fun disableCopyPastePopup(){
+        mAutoCompleteTextView.customSelectionActionModeCallback = object :ActionMode.Callback{
+            override fun onActionItemClicked(p0: ActionMode?, p1: MenuItem?): Boolean {
+                return false
+            }
+
+            override fun onCreateActionMode(p0: ActionMode?, p1: Menu?): Boolean {
+                return false
+            }
+
+            override fun onPrepareActionMode(p0: ActionMode?, p1: Menu?): Boolean {
+                return false
+            }
+
+            override fun onDestroyActionMode(p0: ActionMode?) {
+            }
+        }
     }
 
     private fun initializeAndSetAdapter(){
@@ -144,6 +162,9 @@ class SearchableView @JvmOverloads constructor(
                     closeSearchIfOpen()
                     // When search stopped halfway through, show the last selected item's 'toString()' in AutoCompleteTextView
                     setAutoCompleteText(mSelectedItem.toString())
+
+                    // Clear focus as soon as focus is lost from
+                    requestFocusOnAutocompleteTextView(false, false)
                 }
             }
     }
@@ -228,6 +249,8 @@ class SearchableView @JvmOverloads constructor(
 
             if (requestFocus){
                 requestFocus()
+            }else{
+                clearFocus()
             }
         }
     }

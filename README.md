@@ -50,7 +50,10 @@ dependencies {
     app:ds_iconColor_openSearchView="@color/default_color_open_searchview_icon"
     app:ds_iconColor_closeSearcView="@color/default_color_open_searchview_icon"
     app:ds_isSearchable="true"
-    app:ds_textSelectionMode="end"/>
+    app:ds_textSelectionMode="end"
+    app:cardElevation="@dimen/cardview_default_elevation"
+    app:cardCornerRadius="@dimen/cardview_default_radius"
+    app:cardUseCompatPadding="true"/>
 ```
 **Step 4.** Add your `DynamicSpinner` view to `xml` file where you want it
 ```
@@ -93,3 +96,6 @@ class MainActivity : AppCompatActivity(), DynamicSpinnerAdapter.SpinnerItemSelec
 | app:ds_iconColor_closeSearcView   | #808080          | any color              |   -                                                                                  |
 | app:ds_isSearchable               | true             | true \| false          | if `true` content is searchable                                                      |
 | app:ds_textSelectionMode          | end              | start \| all \| end    | position of cursor when SearchableView opened, `all` means all text will be selected |
+| app:cardCornerRadius              | 2dp              | any dimension          | radius on the edges              |
+| app:cardElevation                 | 2dp              | any dimension          | layout elevation                 |
+| app:cardUseCompatPadding          | true             | true \| false          | padding between spinner items    |

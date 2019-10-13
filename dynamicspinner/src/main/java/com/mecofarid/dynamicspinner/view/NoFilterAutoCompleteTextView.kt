@@ -35,6 +35,9 @@ class NoFilterAutoCompleteTextView: AppCompatAutoCompleteTextView {
           */
         dismissDropDown()
 
+
+        println("meco click ")
+
         return super.performClick()
     }
 }

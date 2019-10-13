@@ -9,4 +9,6 @@
     app:ds_iconColor_openSearchView="@color/default_color_open_searchview_icon"
     app:ds_iconColor_closeSearcView="@color/default_color_open_searchview_icon"
     app:ds_isSearchable="true"
-    app:ds_textSelectionMode="end"/>
+    app:ds_textSelectionMode="end"
+    app:cardElevation="@dimen/cardview_default_elevation"
+    app:cardCornerRadius="@dimen/cardview_default_radius"/>
