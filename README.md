@@ -4,8 +4,9 @@ DynamicSpinner is a library content of each DynamicSpinner changes depending on 
 ![](https://raw.githubusercontent.com/mecoFarid/DynamicSpinner/master/extra_media/library_logo.jpg)
 
 ## Reason for development
-Probably, you're familiar with this nested list where each item has their own subcategory and we have to filter what subcategory is shown depending on what is selected in previous (parent) selection
-![](https://raw.githubusercontent.com/mecoFarid/DynamicSpinner/master/extra_media/nested_item_list.png)
+Probably, you're familiar with this nested list where each item has their own subcategory and we have to filter what subcategory is shown depending on what is selected in previous (parent) selection.
+
+<img src="https://raw.githubusercontent.com/mecoFarid/DynamicSpinner/master/extra_media/nested_item_list.png" width="600">
 
 ## Demo
 Demo application `apk` at the [releases](https://github.com/mecoFarid/DynamicSpinner/releases) tab.
@@ -86,8 +87,8 @@ class MainActivity : AppCompatActivity(), DynamicSpinnerAdapter.SpinnerItemSelec
 
 | Atribute name                     | Default          | Available              |  Description        |
 |     :---                          |      :---        | :---                   |  :---               |
-| app:ds_icon_closeSearchView       | <img src="https://raw.githubusercontent.com/mecoFarid/DynamicSpinner/master/extra_media/default_close.png" width="36">  | any drawable     |   - |
-| app:ds_icon_openSearchView        | <img src="https://raw.githubusercontent.com/mecoFarid/DynamicSpinner/master/extra_media/default_open.png" width="36">   | any drawable     |   - |
+| app:ds_icon_closeSearchView       | <img src="https://raw.githubusercontent.com/mecoFarid/DynamicSpinner/master/extra_media/default_close.png" width="20">  | any drawable     |   - |
+| app:ds_icon_openSearchView        | <img src="https://raw.githubusercontent.com/mecoFarid/DynamicSpinner/master/extra_media/default_open.png" width="20">   | any drawable     |   - |
 | app:ds_iconColor_openSearchView   | #808080          | any color              |   -                                                                                  |
 | app:ds_iconColor_closeSearcView   | #808080          | any color              |   -                                                                                  |
 | app:ds_isSearchable               | true             | true \| false          | if `true` content is searchable                                                      |
