@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.mecofarid.dynamicspinner.view.SearchableView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/searchable_view"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"/>
+    android:layout_height="wrap_content"
+    app:ds_icon_closeSearchView="@drawable/default_close_searchview_icon"
+    app:ds_icon_openSearchView="@drawable/default_open_searchview_icon"
+    app:ds_iconColor_openSearchView="@color/default_color_open_searchview_icon"
+    app:ds_iconColor_closeSearcView="@color/default_color_open_searchview_icon"
+    app:ds_isSearchable="true"
+    app:ds_textSelectionMode="end"/>
