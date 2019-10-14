@@ -24,6 +24,21 @@ class MainActivity : AppCompatActivity(), DynamicSpinnerAdapter.SpinnerItemSelec
             val adapter = DynamicSpinnerAdapter(it, this, R.layout.item_spinner)
             dynamic_spinner.adapter = adapter
         }
+
+        val planetStructureJson = "{\n" +
+                "            \"countryList\": [\n" +
+                "            {\n" +
+                "                \"code\": 6,\n" +
+                "                \"name\": \"Estonia\",\n" +
+                "                \"cityList\": [\n" +
+                "                {\n" +
+                "                    \"name\": \"Tallin\",\n" +
+                "                    \"code\": 60\n" +
+                "                }\n" +
+                "                ]\n" +
+                "            }\n" +
+                "            ]\n" +
+                "        }"
     }
 
     // Numbers shows levels of nested items. That means there're 18 nested lists

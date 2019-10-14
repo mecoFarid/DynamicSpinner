@@ -35,7 +35,8 @@ dependencies {
     implementation 'com.github.mecoFarid:DynamicSpinner:1.0.1'
 }
 ```
-**Step 3.** Create `xml` file to hold your single spinner (let's call it `item_spinner.xml`)
+### 2. Code Sample
+**Step 1.** Create `xml` file to hold your single spinner (let's call it `item_spinner.xml`)
 
 ```
 <?xml version="1.0" encoding="utf-8"?>
@@ -55,14 +56,29 @@ dependencies {
     app:cardCornerRadius="@dimen/cardview_default_radius"
     app:cardUseCompatPadding="true"/>
 ```
-**Step 4.** Add your `DynamicSpinner` view to `xml` file where you want it
+**Step 2.** Add your `DynamicSpinner` view to `xml` file where you want it
 ```
 <com.mecofarid.dynamicspinner.view.DynamicSpinner
         android:id="@+id/dynamic_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 ```
-**Step 5.** Add your nested list
+**Step 3.** Create model objects
+
+Remember to extend  `ItemSpinner` and add `@SubCategory` annotation to subcategory
+
+```
+class Country: ItemSpinner {
+
+    var name: String? = null
+    var code: Integer = 0
+    
+    @SubCategory
+    var cityList:List<City>? = emptyList()
+}
+```
+
+**Step 4.** Add your nested list
 ```
 class MainActivity : AppCompatActivity(), DynamicSpinnerAdapter.SpinnerItemSelectedListener{
 
@@ -70,8 +86,24 @@ class MainActivity : AppCompatActivity(), DynamicSpinnerAdapter.SpinnerItemSelec
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val planetStructureJson = ""   // String nested list
-        val planetStructureList = ...  // You can use Google's Gson library to convert JSON to List
+         // Nested country list (JSON)
+        val planetStructureJson = "{\n" +
+                "            \"countryList\": [\n" +
+                "            {\n" +
+                "                \"code\": 6,\n" +
+                "                \"name\": \"Estonia\",\n" +
+                "                \"cityList\": [\n" +
+                "                {\n" +
+                "                    \"name\": \"Tallin\",\n" +
+                "                    \"code\": 60\n" +
+                "                }\n" +
+                "                ]\n" +
+                "            }\n" +
+                "            ]\n" +
+                "        }" 
+                
+        // You can use Google's Gson library to convert JSON to List 
+        val planetStructureList = ...  
 
         // Initialize adapter
         list?.let {
